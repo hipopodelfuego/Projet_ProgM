@@ -1,5 +1,12 @@
 package com.example.projet_mob
 
+import android.os.Vibrator
+import android.os.VibrationEffect
+import android.content.Context
+import android.animation.ObjectAnimator
+import android.animation.AnimatorSet
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.app.Activity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -41,6 +48,54 @@ class Second : Activity(), GestureDetector.OnGestureListener {
         return true
     }
 
+    private fun animateBottle(isBouchon: Boolean) {
+        val moveAnimation: ObjectAnimator
+        val fadeOut = ObjectAnimator.ofFloat(bottleImageView, "alpha", 0f)
+        fadeOut.duration = 300
+
+        if (isBouchon) {
+            // Animation vers le haut (décapsuler)
+            moveAnimation = ObjectAnimator.ofFloat(bottleImageView, "translationY", -300f)
+        } else {
+            // Animation vers la droite (dévisser)
+            moveAnimation = ObjectAnimator.ofFloat(bottleImageView, "translationX", 300f)
+        }
+
+        moveAnimation.duration = 500
+        moveAnimation.interpolator = DecelerateInterpolator()
+
+        // Jouer les animations ensemble
+        val animatorSet = AnimatorSet()
+        animatorSet.playTogether(moveAnimation, fadeOut)
+        animatorSet.start()
+
+        // Réinitialisation après animation
+        animatorSet.addListener(object : android.animation.Animator.AnimatorListener {
+            override fun onAnimationStart(animation: android.animation.Animator) {}
+
+            override fun onAnimationEnd(animation: android.animation.Animator) {
+                bottleImageView.translationY = 0f
+                bottleImageView.translationX = 0f
+                bottleImageView.alpha = 1f
+                newBottle()
+            }
+
+            override fun onAnimationCancel(animation: android.animation.Animator) {}
+            override fun onAnimationRepeat(animation: android.animation.Animator) {}
+        })
+    }
+
+
+    // Fonction pour vibrer lors d'une bonne action
+    private fun vibrate() {
+        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            vibrator.vibrate(100)
+        }
+    }
+
     override fun onFling(
         e1: MotionEvent?,
         e2: MotionEvent,
@@ -56,11 +111,14 @@ class Second : Activity(), GestureDetector.OnGestureListener {
             if (currentBottleType == "bouchon" && deltaY < -100) {
                 // Swipe vers le haut pour déboucher la bouteille
                 score++
-                newBottle()
+                animateBottle(true)
+                vibrate()
+
             } else if (currentBottleType == "vis" && deltaX > 100) {
                 // Swipe gauche-droite pour dévisser
                 score++
-                newBottle()
+                animateBottle(false)
+                vibrate()
             }
         }
         return true

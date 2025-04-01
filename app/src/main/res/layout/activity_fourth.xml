@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="#F5F5DC">
+
+    <com.example.projet_mob.GlassView
+        android:id="@+id/glassView"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_centerVertical="true"
+        />
+
+    <!-- Zone de remplissage -->
+    <View
+        android:id="@+id/glassFill"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@android:color/holo_blue_light" />
+
+    <!-- Bouton pour remplir -->
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/holo_green_dark"
+        android:text="Remplir"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <!-- Score affiché -->
+    <TextView
+        android:id="@+id/scoreTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Score : 0"
+        android:textSize="24sp"
+        android:textColor="@android:color/black" />
+</RelativeLayout>
