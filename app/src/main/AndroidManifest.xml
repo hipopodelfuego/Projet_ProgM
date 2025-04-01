@@ -28,6 +28,7 @@
         <activity android:name=".SoloGame"/>
         <activity android:name=".First"/>
         <activity android:name=".Second"/>
+        <activity android:name=".Third"/>
     </application>
 
 </manifest>

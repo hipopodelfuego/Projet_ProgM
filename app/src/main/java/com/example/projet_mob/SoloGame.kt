@@ -12,6 +12,7 @@ class SoloGame : Activity() {
 
         val startFirstActivity: Button = findViewById(R.id.btn1)
         val startSecondActivity: Button = findViewById(R.id.btn2)
+        val startThirdActivity: Button = findViewById(R.id.btn3)
 
         startFirstActivity.setOnClickListener {
             val first = Intent(this, First::class.java)
@@ -21,5 +22,9 @@ class SoloGame : Activity() {
             val second = Intent(this, Second::class.java)
             startActivity(second)
         }
+        startThirdActivity.setOnClickListener({
+            val third = Intent(this, Third::class.java)
+            startActivity(third)
+        })
     }
 }
