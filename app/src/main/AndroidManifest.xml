@@ -30,6 +30,7 @@
         <activity android:name=".Second"/>
         <activity android:name=".Fourth"/>
         <activity android:name=".GlassView"/>
+        <activity android:name=".Third"/>
     </application>
 
     <uses-permission android:name="android.permission.VIBRATE"/>
