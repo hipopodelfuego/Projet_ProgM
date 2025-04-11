@@ -17,6 +17,7 @@ class Third : Activity() {
     private lateinit var choice3: Button
     private lateinit var choice4: Button
     private lateinit var point : TextView
+    private lateinit var cocktailsList: MutableList<Cocktail>
     private var score : Int = 0
 
     private val cocktails = listOf(
@@ -39,6 +40,8 @@ class Third : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_third)
 
+        val cocktails_melange = cocktails.shuffled()
+
         questionTextView = findViewById(R.id.questionTextView)
         cocktailImageView = findViewById(R.id.cocktailImageView)
         feedbackTextView = findViewById(R.id.feedbackTextView)
@@ -48,9 +51,9 @@ class Third : Activity() {
         choice4 = findViewById(R.id.choice4)
         point = findViewById(R.id.point)
 
+        cocktailsList = cocktails_melange.toMutableList()
         loadQuestion()
 
-        // Ajouter des listeners aux boutons
         val buttons = listOf(choice1, choice2, choice3, choice4)
         for (button in buttons) {
             button.setOnClickListener {
@@ -60,13 +63,13 @@ class Third : Activity() {
     }
 
     private fun loadQuestion() {
+        setButtonsEnabled(true)
         point.text = "Score : ${score}"
-        val cocktail = cocktails[currentCocktailIndex]
+        val cocktail = cocktailsList[currentCocktailIndex]
         questionTextView.text = "Quel est l'alcool dans ${cocktail.name} ?"
         cocktailImageView.setImageResource(cocktail.imageRes)
         correctAnswer = cocktail.correctAlcohol
 
-        // Mélanger les réponses
         val options = mutableListOf("Vodka", "Gin", "Rhum", "Tequila").shuffled()
         choice1.text = options[0]
         choice2.text = options[1]
@@ -83,9 +86,31 @@ class Third : Activity() {
             feedbackTextView.text = "Mauvaise réponse... 😞 C'était $correctAnswer"
             Toast.makeText(this, "Mauvaise réponse !", Toast.LENGTH_SHORT).show()
         }
-
-        currentCocktailIndex = (currentCocktailIndex + 1) % cocktails.size
-        feedbackTextView.postDelayed({ loadQuestion() }, 2000)
+        setButtonsEnabled(false)
+        currentCocktailIndex++
+        if (currentCocktailIndex < cocktailsList.size) {
+            feedbackTextView.postDelayed({ loadQuestion() }, 1000)
+        } else {
+            feedbackTextView.postDelayed({
+                showFinalScore()
+            }, 1000)
+        }
+    }
+    private fun showFinalScore() {
+        questionTextView.text = "Quiz terminé 🎉"
+        feedbackTextView.text = "Votre score final est : $score / ${cocktailsList.size}"
+        cocktailImageView.visibility = ImageView.GONE
+        choice1.visibility = Button.GONE
+        choice2.visibility = Button.GONE
+        choice3.visibility = Button.GONE
+        choice4.visibility = Button.GONE
+        point.visibility = TextView.GONE
+    }
+    private fun setButtonsEnabled(enabled: Boolean) {
+        choice1.isEnabled = enabled
+        choice2.isEnabled = enabled
+        choice3.isEnabled = enabled
+        choice4.isEnabled = enabled
     }
 
     data class Cocktail(val name: String, val imageRes: Int, val correctAlcohol: String)

@@ -13,14 +13,12 @@
         android:layout_centerVertical="true"
         />
 
-    <!-- Zone de remplissage -->
     <View
         android:id="@+id/glassFill"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@android:color/holo_blue_light" />
 
-    <!-- Bouton pour remplir -->
     <Button
         android:id="@+id/startButton"
         android:layout_width="150dp"
@@ -32,7 +30,6 @@
         android:textColor="@android:color/white"
         android:textSize="18sp" />
 
-    <!-- Score affiché -->
     <TextView
         android:id="@+id/scoreTextView"
         android:layout_width="wrap_content"

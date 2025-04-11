@@ -23,7 +23,7 @@ class SoloGame : Activity() {
             val second = Intent(this, Second::class.java)
             startActivity(second)
         }
-        startThirdActivity.setOnClickListener {
+        startFourthActivity.setOnClickListener {
             val fourth = Intent(this, Fourth::class.java)
             startActivity(fourth)
         }
