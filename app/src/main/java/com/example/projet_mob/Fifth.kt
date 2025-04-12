@@ -1,6 +1,7 @@
 package com.example.projet_mob
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -19,6 +20,7 @@ class Fifth : Activity() {
     private var correctImageRes: Int = 0
     private var score: Int = 0
     private var currentQuestionIndex = 0
+    private lateinit var nextButton: Button
 
 
     data class Question(
@@ -52,6 +54,13 @@ class Fifth : Activity() {
         option2 = findViewById(R.id.option2)
         option3 = findViewById(R.id.option3)
         option4 = findViewById(R.id.option4)
+        nextButton = findViewById(R.id.btnNext)
+        nextButton.setOnClickListener {
+            val resultIntent = Intent()
+            resultIntent.putExtra("score", score)
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish()
+        }
 
         val options = listOf(option1, option2, option3, option4)
 
@@ -97,9 +106,31 @@ class Fifth : Activity() {
             Toast.makeText(this, "Incorrect", Toast.LENGTH_SHORT).show()
         }
 
-        currentQuestionIndex = (currentQuestionIndex + 1) % questions.size
-        feedbackTextView.postDelayed({ loadQuestion() }, 2000)
+        // On passe à la question suivante
+        currentQuestionIndex++
+
+        // S'il reste des questions, on charge la suivante
+        if (currentQuestionIndex < questions.size) {
+            feedbackTextView.postDelayed({ loadQuestion() }, 2000)
+        } else {
+            // Sinon, on affiche l'écran de fin
+            feedbackTextView.postDelayed({
+                showEndScreen()
+            }, 2000)
+        }
     }
 
+
+
+    private fun showEndScreen() {
+        questionTextView.text = "🎉 Quiz terminé !"
+        option1.visibility = Button.GONE
+        option2.visibility = Button.GONE
+        option3.visibility = Button.GONE
+        option4.visibility = Button.GONE
+        scoreTextView.visibility = TextView.GONE
+        feedbackTextView.text = "Votre score final : $score / ${questions.size}"
+        nextButton.visibility = Button.VISIBLE
+    }
     //data class Cocktail(val name: String, val imageRes: Int, val correctAlcohol: String)
 }

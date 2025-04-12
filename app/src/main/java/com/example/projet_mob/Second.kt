@@ -8,10 +8,13 @@ import android.animation.AnimatorSet
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import kotlin.random.Random
@@ -22,6 +25,7 @@ class Second : Activity(), GestureDetector.OnGestureListener {
     private lateinit var bottleImageView: ImageView
     private lateinit var scoreTextView: TextView
     private lateinit var timerTextView: TextView
+    private lateinit var nextButton: Button
 
     private var score = 0
     private var isGameRunning = false
@@ -34,6 +38,13 @@ class Second : Activity(), GestureDetector.OnGestureListener {
         bottleImageView = findViewById(R.id.bottleImageView)
         scoreTextView = findViewById(R.id.scoreTextView)
         timerTextView = findViewById(R.id.timerTextView)
+        nextButton = findViewById(R.id.btnNext)
+        nextButton.setOnClickListener {
+            val resultIntent = Intent()
+            resultIntent.putExtra("score", score)
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish() // retourne à SoloGame → onActivityResult → next
+        }
 
         gestureDetector = GestureDetector(this, this)
 
@@ -149,6 +160,7 @@ class Second : Activity(), GestureDetector.OnGestureListener {
             override fun onFinish() {
                 isGameRunning = false
                 timerTextView.text = "⏳ Temps écoulé ! Score final : $score"
+                nextButton.visibility = View.VISIBLE
             }
         }.start()
     }
@@ -165,4 +177,5 @@ class Second : Activity(), GestureDetector.OnGestureListener {
 
         scoreTextView.text = "Score : $score"
     }
+
 }

@@ -1,6 +1,7 @@
 package com.example.projet_mob
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -18,6 +19,8 @@ class Third : Activity() {
     private lateinit var choice4: Button
     private lateinit var point : TextView
     private var score : Int = 0
+    private lateinit var nextButton: Button
+
 
     private val cocktails = listOf(
         Cocktail("Mojito", R.drawable.mojito, "Rhum"),
@@ -47,6 +50,14 @@ class Third : Activity() {
         choice3 = findViewById(R.id.choice3)
         choice4 = findViewById(R.id.choice4)
         point = findViewById(R.id.point)
+        nextButton = findViewById(R.id.btnNext)
+        nextButton.setOnClickListener {
+            val resultIntent = Intent()
+            resultIntent.putExtra("score", score)
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish()
+        }
+
 
         loadQuestion()
 
@@ -78,14 +89,35 @@ class Third : Activity() {
         if (selectedAnswer == correctAnswer) {
             feedbackTextView.text = "Bonne réponse ! 🎉"
             Toast.makeText(this, "Bonne réponse !", Toast.LENGTH_SHORT).show()
-            score+=1
+            score += 1
         } else {
             feedbackTextView.text = "Mauvaise réponse... 😞 C'était $correctAnswer"
             Toast.makeText(this, "Mauvaise réponse !", Toast.LENGTH_SHORT).show()
         }
 
-        currentCocktailIndex = (currentCocktailIndex + 1) % cocktails.size
-        feedbackTextView.postDelayed({ loadQuestion() }, 2000)
+        currentCocktailIndex++
+
+        if (currentCocktailIndex < cocktails.size) {
+            // Continuer le quiz après une petite pause
+            feedbackTextView.postDelayed({ loadQuestion() }, 2000)
+        } else {
+            // Fin du quiz
+            feedbackTextView.postDelayed({
+                showEndScreen()
+            }, 2000)
+        }
+    }
+
+    private fun showEndScreen() {
+        questionTextView.text = "🎉 Quiz terminé !"
+        cocktailImageView.setImageResource(0) // efface l’image
+        choice1.visibility = Button.GONE
+        choice2.visibility = Button.GONE
+        choice3.visibility = Button.GONE
+        choice4.visibility = Button.GONE
+        point.visibility = TextView.GONE
+        feedbackTextView.text = "Votre score final : $score / ${cocktails.size}"
+        nextButton.visibility = Button.VISIBLE
     }
 
     data class Cocktail(val name: String, val imageRes: Int, val correctAlcohol: String)

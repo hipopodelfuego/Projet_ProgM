@@ -33,6 +33,7 @@
         <activity android:name=".Third"/>
         <activity android:name=".Fifth"/>
         <activity android:name=".Sixth"/>
+        <activity android:name=".FinalScoreActivity"/>
     </application>
 
     <uses-permission android:name="android.permission.VIBRATE"/>
