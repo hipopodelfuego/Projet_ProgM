@@ -15,6 +15,8 @@ class SoloGame : Activity() {
         val startFourthActivity: Button = findViewById(R.id.btn4)
         val startThirdActivity: Button = findViewById(R.id.btn3)
         val startFifthActivity: Button = findViewById(R.id.btn5)
+        val startSixthActivity: Button = findViewById(R.id.btn6)
+        val randomButton: Button = findViewById(R.id.btnRandom)
 
         startFirstActivity.setOnClickListener {
             val first = Intent(this, First::class.java)
@@ -36,5 +38,14 @@ class SoloGame : Activity() {
             val fifth = Intent(this, Fifth::class.java)
             startActivity(fifth)
         })
+        startSixthActivity.setOnClickListener({
+            val sixth = Intent(this, Sixth::class.java)
+            startActivity(sixth)
+        })
+        randomButton.setOnClickListener {
+            val randomIntent = Intent(this, RandomGameActivity::class.java)
+            startActivity(randomIntent)
+        }
+
     }
 }

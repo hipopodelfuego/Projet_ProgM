@@ -32,8 +32,10 @@
         <activity android:name=".GlassView"/>
         <activity android:name=".Third"/>
         <activity android:name=".Fifth"/>
+        <activity android:name=".Sixth"/>
     </application>
 
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
 </manifest>
