@@ -31,8 +31,12 @@
         <activity android:name=".Fourth"/>
         <activity android:name=".GlassView"/>
         <activity android:name=".Third"/>
+        <activity android:name=".Fifth"/>
+        <activity android:name=".Sixth"/>
+        <activity android:name=".FinalScoreActivity"/>
     </application>
 
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
 </manifest>

@@ -103,4 +103,13 @@
         android:textSize="20sp"
         android:textColor="#000"
         android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Suivant"
+        android:visibility="gone"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"/>
 </LinearLayout>

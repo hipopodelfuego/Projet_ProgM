@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:padding="16dp"
+android:gravity="center"
+android:background="#FFFACD">
+
+<TextView
+    android:id="@+id/questionTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Question ici"
+    android:textSize="20sp"
+    android:textColor="#000"
+    android:layout_marginBottom="20dp"/>
+
+<GridLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:columnCount="2"
+    android:rowCount="2"
+    android:alignmentMode="alignMargins"
+    android:columnOrderPreserved="false"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:id="@+id/option1"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="8dp"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/option2"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="8dp"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/option3"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="8dp"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/option4"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="8dp"
+        android:scaleType="centerCrop" />
+</GridLayout>
+
+<TextView
+    android:id="@+id/feedbackTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text=""
+    android:textSize="18sp"
+    android:textColor="#444"
+    android:layout_marginTop="20dp" />
+
+<TextView
+    android:id="@+id/scoreTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Score : 0"
+    android:textSize="18sp"
+    android:textColor="#000"
+    android:layout_marginTop="10dp" />
+
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Suivant"
+        android:visibility="gone"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"/>
+</LinearLayout>

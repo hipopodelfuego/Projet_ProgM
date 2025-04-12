@@ -1,6 +1,7 @@
 package com.example.projet_mob
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -19,6 +20,8 @@ class Third : Activity() {
     private lateinit var point : TextView
     private lateinit var cocktailsList: MutableList<Cocktail>
     private var score : Int = 0
+    private lateinit var nextButton: Button
+
 
     private val cocktails = listOf(
         Cocktail("Mojito", R.drawable.mojito, "Rhum"),
@@ -50,6 +53,14 @@ class Third : Activity() {
         choice3 = findViewById(R.id.choice3)
         choice4 = findViewById(R.id.choice4)
         point = findViewById(R.id.point)
+        nextButton = findViewById(R.id.btnNext)
+        nextButton.setOnClickListener {
+            val resultIntent = Intent()
+            resultIntent.putExtra("score", score)
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish()
+        }
+
 
         cocktailsList = cocktails_melange.toMutableList()
         loadQuestion()
@@ -81,7 +92,7 @@ class Third : Activity() {
         if (selectedAnswer == correctAnswer) {
             feedbackTextView.text = "Bonne réponse ! 🎉"
             Toast.makeText(this, "Bonne réponse !", Toast.LENGTH_SHORT).show()
-            score+=1
+            score += 1
         } else {
             feedbackTextView.text = "Mauvaise réponse... 😞 C'était $correctAnswer"
             Toast.makeText(this, "Mauvaise réponse !", Toast.LENGTH_SHORT).show()

@@ -1,6 +1,7 @@
 package com.example.projet_mob
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,10 +14,13 @@ import kotlin.random.Random
 
 class Fourth : Activity() {
 
+    private lateinit var endScreen: View
+    private lateinit var finalScoreText: TextView
+    private lateinit var nextButton: Button
     private lateinit var glassView: GlassView
     private lateinit var startButton: Button
     private lateinit var scoreTextView: TextView
-
+    private var score: Int = 0
     private var isFilling = false
     private var fillHeight = 0f
     private var targetHeight = 0f
@@ -29,6 +33,16 @@ class Fourth : Activity() {
         glassView = findViewById(R.id.glassView)
         startButton = findViewById(R.id.startButton)
         scoreTextView = findViewById(R.id.scoreTextView)
+        endScreen = findViewById(R.id.endScreen)
+        finalScoreText = findViewById(R.id.finalScoreText)
+        nextButton = findViewById(R.id.nextButton)
+        nextButton.setOnClickListener {
+            val resultIntent = Intent()
+            resultIntent.putExtra("score", score)
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish() // ou démarre une autre activité si tu veux enchaîner
+        }
+
 
         val glassHeight = 400f
         targetHeight = (Random.nextFloat() * glassHeight * 0.8f)
@@ -50,10 +64,16 @@ class Fourth : Activity() {
 
     private fun stopFilling() {
         isFilling = false
-        startButton.isEnabled = false // Désactiver le bouton après relâchement
-        val score = 100 - Math.abs(targetHeight - fillHeight).toInt()
+        startButton.isEnabled = false
+
+        score = 100 - Math.abs(targetHeight - fillHeight).toInt()
         scoreTextView.text = "Score : $score"
+
+        // Afficher l'écran de fin
+        finalScoreText.text = "Score final : $score"
+        endScreen.visibility = View.VISIBLE
     }
+
 
     private val fillRunnable = object : Runnable {
         override fun run() {
