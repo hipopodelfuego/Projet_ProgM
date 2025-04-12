@@ -7,10 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import kotlin.random.Random
-
 
 class Fourth : Activity() {
 
@@ -40,7 +38,7 @@ class Fourth : Activity() {
             val resultIntent = Intent()
             resultIntent.putExtra("score", score)
             setResult(Activity.RESULT_OK, resultIntent)
-            finish() // ou démarre une autre activité si tu veux enchaîner
+            finish()
         }
 
 

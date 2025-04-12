@@ -9,7 +9,7 @@ import kotlin.random.Random
 class SoloGame : Activity() {
 
     private val activities = listOf(
-        //First::class.java,
+        First::class.java,
         Second::class.java,
         Third::class.java,
         Fourth::class.java,
@@ -44,25 +44,11 @@ class SoloGame : Activity() {
             startActivity(Intent(this, Sixth::class.java))
         }
 
-        // BOUTON ALÉATOIRE
         findViewById<Button>(R.id.btnRandom).setOnClickListener {
-            // Choisir 4 activités aléatoires
             randomSequence = activities.shuffled().take(3)
             currentIndex = 0
             launchNextActivity()
         }
-        startSecondActivity.setOnClickListener {
-            val second = Intent(this, Second::class.java)
-            startActivity(second)
-        }
-        startFourthActivity.setOnClickListener {
-            val fourth = Intent(this, Fourth::class.java)
-            startActivity(fourth)
-        }
-        startThirdActivity.setOnClickListener({
-            val third = Intent(this, Third::class.java)
-            startActivity(third)
-        })
     }
 
     private fun launchNextActivity() {

@@ -1,25 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:gravity="center"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:background="#FFFACD">
 
-    <ImageView
-        android:id="@+id/verreImageView"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:src="@drawable/verre" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/scoreTextView"
-        android:text="Score : 0 sec"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        android:layout_marginTop="20dp" />
+        <TextView
+            android:id="@+id/timerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temps restant : 30s"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginTop="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/scoreTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Score : 0"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="16dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true" />
+
+
+        <ImageView
+            android:id="@+id/glassImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="30dp"
+            android:src="@drawable/verre"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/endScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:background="#AA000000"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/finalScoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Score final :"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"
+            android:padding="16dp" />
+
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suivant"
+            android:padding="10dp" />
+    </LinearLayout>
+
+</FrameLayout>

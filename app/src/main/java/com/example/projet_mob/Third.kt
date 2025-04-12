@@ -7,6 +7,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import android.os.CountDownTimer
+import android.view.View
+import android.widget.LinearLayout
 
 class Third : Activity() {
 
@@ -21,6 +24,13 @@ class Third : Activity() {
     private lateinit var cocktailsList: MutableList<Cocktail>
     private var score : Int = 0
     private lateinit var nextButton: Button
+    private lateinit var countDownTimer: CountDownTimer
+    private lateinit var timer: TextView
+    private val questionTimeInMillis: Long = 5000
+
+    private lateinit var endScreen: LinearLayout
+    private lateinit var finalScoreText: TextView
+    private lateinit var endNextButton: Button
 
 
     private val cocktails = listOf(
@@ -53,14 +63,18 @@ class Third : Activity() {
         choice3 = findViewById(R.id.choice3)
         choice4 = findViewById(R.id.choice4)
         point = findViewById(R.id.point)
-        nextButton = findViewById(R.id.btnNext)
-        nextButton.setOnClickListener {
+        timer = findViewById(R.id.timerTextView)
+
+        endScreen = findViewById(R.id.endScreen)
+        finalScoreText = findViewById(R.id.finalScoreText)
+        endNextButton = findViewById(R.id.nextButton)
+
+        endNextButton.setOnClickListener {
             val resultIntent = Intent()
             resultIntent.putExtra("score", score)
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
         }
-
 
         cocktailsList = cocktails_melange.toMutableList()
         loadQuestion()
@@ -86,9 +100,12 @@ class Third : Activity() {
         choice2.text = options[1]
         choice3.text = options[2]
         choice4.text = options[3]
+
+        startTimer()
     }
 
     private fun checkAnswer(selectedAnswer: String) {
+        countDownTimer.cancel()
         if (selectedAnswer == correctAnswer) {
             feedbackTextView.text = "Bonne réponse ! 🎉"
             Toast.makeText(this, "Bonne réponse !", Toast.LENGTH_SHORT).show()
@@ -109,19 +126,35 @@ class Third : Activity() {
     }
     private fun showFinalScore() {
         questionTextView.text = "Quiz terminé 🎉"
-        feedbackTextView.text = "Votre score final est : $score / ${cocktailsList.size}"
-        cocktailImageView.visibility = ImageView.GONE
-        choice1.visibility = Button.GONE
-        choice2.visibility = Button.GONE
-        choice3.visibility = Button.GONE
-        choice4.visibility = Button.GONE
-        point.visibility = TextView.GONE
+        endScreen.visibility = View.VISIBLE
+        finalScoreText.text = "Votre score final est : $score / ${cocktailsList.size}"
     }
     private fun setButtonsEnabled(enabled: Boolean) {
         choice1.isEnabled = enabled
         choice2.isEnabled = enabled
         choice3.isEnabled = enabled
         choice4.isEnabled = enabled
+    }
+    private fun startTimer() {
+        timer.text = "Temps restant : 5s"
+        countDownTimer = object : CountDownTimer(questionTimeInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = millisUntilFinished / 1000
+                timer.text = "Temps restant : $secondsLeft s"
+            }
+
+            override fun onFinish() {
+                feedbackTextView.text = "Temps écoulé ! ⏰ C'était $correctAnswer"
+                setButtonsEnabled(false)
+                currentCocktailIndex++
+                if (currentCocktailIndex < cocktailsList.size) {
+                    feedbackTextView.postDelayed({ loadQuestion() }, 1000)
+                } else {
+                    feedbackTextView.postDelayed({ showFinalScore() }, 1000)
+                }
+            }
+        }
+        countDownTimer.start()
     }
 
     data class Cocktail(val name: String, val imageRes: Int, val correctAlcohol: String)

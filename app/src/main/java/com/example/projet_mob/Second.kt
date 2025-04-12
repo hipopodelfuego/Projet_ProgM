@@ -27,6 +27,10 @@ class Second : Activity(), GestureDetector.OnGestureListener {
     private lateinit var timerTextView: TextView
     private lateinit var nextButton: Button
 
+    private lateinit var endScreen: View
+    private lateinit var finalScoreText: TextView
+    private lateinit var endNextButton: Button
+
     private var score = 0
     private var isGameRunning = false
     private var currentBottleType = "" // "bouchon" ou "vis"
@@ -44,6 +48,18 @@ class Second : Activity(), GestureDetector.OnGestureListener {
             resultIntent.putExtra("score", score)
             setResult(Activity.RESULT_OK, resultIntent)
             finish() // retourne à SoloGame → onActivityResult → next
+        }
+        endScreen = findViewById(R.id.endScreen)
+        finalScoreText = findViewById(R.id.finalScoreText)
+        endNextButton = findViewById(R.id.nextButton)
+
+        endScreen.visibility = View.GONE
+
+        endNextButton.setOnClickListener {
+            val resultIntent = Intent()
+            resultIntent.putExtra("score", score)
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish()
         }
 
         gestureDetector = GestureDetector(this, this)
@@ -159,8 +175,9 @@ class Second : Activity(), GestureDetector.OnGestureListener {
 
             override fun onFinish() {
                 isGameRunning = false
-                timerTextView.text = "⏳ Temps écoulé ! Score final : $score"
-                nextButton.visibility = View.VISIBLE
+                timerTextView.text = "Temps écoulé !"
+                endScreen.visibility = View.VISIBLE
+                finalScoreText.text = "Score final : $score"
             }
         }.start()
     }
