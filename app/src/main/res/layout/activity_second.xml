@@ -14,7 +14,7 @@
             android:id="@+id/timerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Temps restant : 30s"
+            android:text="@string/time_left"
             android:textSize="24sp"
             android:textColor="#000"
             android:layout_marginBottom="10dp"
@@ -24,36 +24,20 @@
             android:id="@+id/bottleImageView"
             android:layout_width="200dp"
             android:layout_height="300dp"
-            android:src="@drawable/bouteille_bouchon"
+            android:contentDescription="@string/bouteille"
+            android:src="@drawable/activity2_bouteille_bouchon"
             android:layout_marginBottom="20dp" />
 
         <TextView
             android:id="@+id/scoreTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Score : 0"
+            android:text="@string/score_text"
             android:textSize="24sp"
             android:textColor="#000"
             android:layout_marginBottom="10dp"
             android:gravity="center" />
 
-        <Button
-            android:id="@+id/restartButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rejouer"
-            android:visibility="gone"
-            android:padding="10dp"
-            android:background="#6200EE"
-            android:textColor="#FFF" />
-
-        <Button
-            android:id="@+id/btnNext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Suivant"
-            android:visibility="gone"
-            android:layout_marginTop="20dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -69,7 +53,7 @@
             android:id="@+id/finalScoreText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Score final :"
+            android:text="@string/score_final_text"
             android:textSize="24sp"
             android:textColor="#FFFFFF"
             android:padding="16dp" />
@@ -78,7 +62,7 @@
             android:id="@+id/nextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Suivant" />
+            android:text="@string/next_button" />
     </LinearLayout>
 
 </FrameLayout>

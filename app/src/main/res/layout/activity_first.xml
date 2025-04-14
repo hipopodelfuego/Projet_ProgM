@@ -12,7 +12,7 @@
             android:id="@+id/timerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Temps restant : 30s"
+            android:text="@string/time_left"
             android:textSize="18sp"
             android:textColor="#000000"
             android:layout_marginTop="32dp"
@@ -24,7 +24,7 @@
             android:id="@+id/scoreTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Score : 0"
+            android:text="@string/score_text"
             android:textSize="18sp"
             android:textColor="#000000"
             android:layout_marginTop="32dp"
@@ -37,8 +37,9 @@
             android:id="@+id/glassImageView"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginBottom="30dp"
-            android:src="@drawable/verre"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/glass"
+            android:src="@drawable/activity1_verre"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
     </RelativeLayout>
@@ -58,7 +59,7 @@
             android:id="@+id/finalScoreText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Score final :"
+            android:text="@string/score_final_text"
             android:textSize="24sp"
             android:textColor="#FFFFFF"
             android:padding="16dp" />
@@ -67,7 +68,7 @@
             android:id="@+id/nextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Suivant"
+            android:text="@string/next_button"
             android:padding="10dp" />
     </LinearLayout>
 

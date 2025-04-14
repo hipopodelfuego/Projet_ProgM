@@ -51,7 +51,7 @@ class First : Activity(), SensorEventListener {
         nextButton.setOnClickListener {
             val resultIntent = Intent()
             resultIntent.putExtra("score", score)
-            setResult(Activity.RESULT_OK, resultIntent)
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
     }
@@ -87,13 +87,13 @@ class First : Activity(), SensorEventListener {
         object : CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = millisUntilFinished / 1000
-                timerTextView.text = "Temps restant : $secondsLeft s"
+                timerTextView.text = getString(R.string.time_left,secondsLeft)
                 spawnDrop()
             }
 
             override fun onFinish() {
                 gameRunning = false
-                timerTextView.text = "Temps écoulé !"
+                timerTextView.text = getString(R.string.time_end)
                 showEndScreen()
             }
         }.start()
@@ -105,7 +105,7 @@ class First : Activity(), SensorEventListener {
 
         val isAlcohol = Random.nextBoolean()
         val drop = ImageView(this)
-        val drawable = if (isAlcohol) R.drawable.goutte_alcool else R.drawable.goutte_eau
+        val drawable = if (isAlcohol) R.drawable.activity1_goutte_alcool else R.drawable.activity1_goutte_eau
         drop.setImageResource(drawable)
 
         val params = FrameLayout.LayoutParams(dropSize, dropSize)
@@ -136,7 +136,7 @@ class First : Activity(), SensorEventListener {
                     gameLayout.removeView(drop)
                     activeDrops.remove(drop)
                     score += if (isAlcohol) 1 else -1
-                    scoreTextView.text = "Score : $score"
+                    scoreTextView.text = getString(R.string.score_text, score)
                 } else if (drop.y > gameLayout.height) {
                     gameLayout.removeView(drop)
                     activeDrops.remove(drop)
@@ -158,7 +158,7 @@ class First : Activity(), SensorEventListener {
         activeDrops.clear()
 
         endScreen.visibility = View.VISIBLE
-        finalScoreText.text = "Score final : $score"
+        finalScoreText.text = getString(R.string.score_final_text, score)
     }
 
 

@@ -15,7 +15,7 @@
             android:id="@+id/questionTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quel est ce bar ?"
+            android:text="@string/question_bar"
             android:textSize="20sp"
             android:textColor="#000"
             android:layout_marginBottom="20dp"/>
@@ -23,9 +23,9 @@
             android:id="@+id/timerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Temps restant : 5s"
+            android:text="@string/time_left"
             android:textSize="18sp"
-            android:textColor="#FF0000"
+            android:textColor="#8B0000"
             android:layout_marginBottom="16dp"/>
 
         <GridLayout
@@ -42,6 +42,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_margin="8dp"
+                android:contentDescription="@string/option_bar"
                 android:scaleType="centerCrop" />
 
             <ImageView
@@ -49,6 +50,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_margin="8dp"
+                android:contentDescription="@string/option_bar"
                 android:scaleType="centerCrop" />
 
             <ImageView
@@ -56,6 +58,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_margin="8dp"
+                android:contentDescription="@string/option_bar"
                 android:scaleType="centerCrop" />
 
             <ImageView
@@ -63,6 +66,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_margin="8dp"
+                android:contentDescription="@string/option_bar"
                 android:scaleType="centerCrop" />
         </GridLayout>
 
@@ -79,19 +83,10 @@
             android:id="@+id/scoreTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Score : 0"
+            android:text="@string/score_text"
             android:textSize="18sp"
             android:textColor="#000"
             android:layout_marginTop="10dp" />
-
-        <Button
-            android:id="@+id/btnNext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Suivant"
-            android:visibility="gone"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center"/>
     </LinearLayout>
 
     <LinearLayout
@@ -107,7 +102,7 @@
             android:id="@+id/finalScoreText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Score final :"
+            android:text="@string/score_final_text"
             android:textSize="24sp"
             android:textColor="#FFFFFF"
             android:padding="16dp" />
@@ -116,7 +111,7 @@
             android:id="@+id/nextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Suivant"
+            android:text="@string/next_button"
             android:padding="10dp" />
     </LinearLayout>
 

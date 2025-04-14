@@ -15,9 +15,10 @@
 
         <Button
             android:id="@+id/btn1"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="La pluie de gouttes"
+            android:minWidth="300dp"
+            android:text="@string/activity1"
             android:textSize="20sp"
             android:textColor="#000000"
             android:background="#FFD700"
@@ -26,9 +27,10 @@
 
         <Button
             android:id="@+id/btn2"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mission Dévissage"
+            android:minWidth="300dp"
+            android:text="@string/activity2"
             android:textSize="20sp"
             android:textColor="#000000"
             android:background="#FFD700"
@@ -37,9 +39,10 @@
 
         <Button
             android:id="@+id/btn3"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quiz Cocktails"
+            android:minWidth="300dp"
+            android:text="@string/activity3"
             android:textSize="20sp"
             android:textColor="#000000"
             android:background="#FFD700"
@@ -48,9 +51,10 @@
 
         <Button
             android:id="@+id/btn4"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Remplir sans déborder"
+            android:minWidth="300dp"
+            android:text="@string/activity4"
             android:textSize="20sp"
             android:textColor="#000000"
             android:background="#FFD700"
@@ -59,9 +63,10 @@
 
         <Button
             android:id="@+id/btn5"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Trouve le bar"
+            android:minWidth="300dp"
+            android:text="@string/activity5"
             android:textSize="20sp"
             android:textColor="#000000"
             android:background="#FFD700"
@@ -70,9 +75,10 @@
 
         <Button
             android:id="@+id/btn6"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test d'alcoolémie"
+            android:minWidth="300dp"
+            android:text="@string/activity6"
             android:textSize="20sp"
             android:textColor="#000000"
             android:background="#FFD700"
@@ -84,9 +90,9 @@
         android:id="@+id/btnRandom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Entrainement"
+        android:text="@string/training"
         android:textSize="18sp"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:layout_marginTop="30dp"
         android:padding="12dp"
         android:layout_gravity="center" />

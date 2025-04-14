@@ -11,6 +11,7 @@ import android.widget.Toast
 import android.content.pm.PackageManager
 import android.Manifest
 import android.content.Intent
+import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.File
@@ -25,7 +26,7 @@ class Sixth : Activity() {
     private var mediaRecorder: MediaRecorder? = null
     private var maxAmplitude = 0
     private val handler = Handler(Looper.getMainLooper())
-    private val RECORD_AUDIO_REQUEST_CODE = 101
+    private val recordaudiorequestcode = 101
     private var hasBlown = false
     private var gameEnded = false
     private var finalScore: Int = 0
@@ -42,20 +43,18 @@ class Sixth : Activity() {
         nextButton.setOnClickListener {
             val resultIntent = Intent()
             resultIntent.putExtra("score", finalScore)
-            setResult(Activity.RESULT_OK, resultIntent)
-            finish() // ou startActivity(Intent(this, NextActivity::class.java))
+            setResult(RESULT_OK, resultIntent)
+            finish()
         }
 
-
-        // Vérifie la permission micro
+        //permission micro
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_REQUEST_CODE)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), recordaudiorequestcode)
         } else {
             startListening()
         }
     }
 
-    // Gère la réponse utilisateur
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -63,7 +62,7 @@ class Sixth : Activity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == RECORD_AUDIO_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == recordaudiorequestcode && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startListening()
         } else {
             Toast.makeText(this, "Permission micro refusée", Toast.LENGTH_SHORT).show()
@@ -73,12 +72,18 @@ class Sixth : Activity() {
     private fun startListening() {
         try {
             val outputFile = File(cacheDir, "temp_audio.3gp").absolutePath
+            mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                MediaRecorder(this)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaRecorder()
+            }
 
-            mediaRecorder = MediaRecorder().apply {
+            mediaRecorder?.apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
                 setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-                setOutputFile(outputFile) // Ne pas utiliser "/dev/null"
+                setOutputFile(outputFile)
                 prepare()
                 start()
             }
@@ -87,7 +92,7 @@ class Sixth : Activity() {
 
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Erreur en démarrant le micro : ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Erreur en utilisant le micro : ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -95,12 +100,12 @@ class Sixth : Activity() {
         override fun run() {
             val amp = mediaRecorder?.maxAmplitude ?: 0
 
-            if (amp > 1500 && !gameEnded) { // seuil pour détecter qu’on souffle
+            if (amp > 1500 && !gameEnded) {
                 hasBlown = true
                 if (amp > maxAmplitude) maxAmplitude = amp
 
                 val score = ((amp / 32767.0) * 100).toInt().coerceAtMost(100)
-                scoreText.text = "Score : $score"
+                scoreText.text = getString(R.string.score_text, score)
                 fanImage.rotation += score / 2f
 
                 handler.postDelayed(this, 100)
@@ -108,14 +113,11 @@ class Sixth : Activity() {
                 // Le joueur a soufflé puis s’est arrêté -> fin du jeu
                 gameEnded = true
                 finalScore = ((maxAmplitude / 32767.0) * 100).toInt().coerceAtMost(100)
-                scoreText.text = "Score final : $finalScore"
                 stopListening()
 
-                // 🟢 Afficher l'écran de fin
-                finalScoreText.text = "Score final : $finalScore"
+                finalScoreText.text = getString(R.string.score_final_text, finalScore)
                 endScreen.visibility = android.view.View.VISIBLE
             } else if (!gameEnded) {
-                // continue à checker régulièrement (au cas où il commence à souffler plus tard)
                 handler.postDelayed(this, 100)
             }
         }

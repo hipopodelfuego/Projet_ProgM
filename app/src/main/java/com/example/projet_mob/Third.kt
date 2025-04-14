@@ -23,7 +23,6 @@ class Third : Activity() {
     private lateinit var point : TextView
     private lateinit var cocktailsList: MutableList<Cocktail>
     private var score : Int = 0
-    private lateinit var nextButton: Button
     private lateinit var countDownTimer: CountDownTimer
     private lateinit var timer: TextView
     private val questionTimeInMillis: Long = 5000
@@ -34,16 +33,16 @@ class Third : Activity() {
 
 
     private val cocktails = listOf(
-        Cocktail("Mojito", R.drawable.mojito, "Rhum"),
-        Cocktail("Daïquiri", R.drawable.daiquiri, "Rhum"),
-        Cocktail("Punch", R.drawable.punch, "Rhum"),
-        Cocktail("Margarita", R.drawable.margarita, "Tequila"),
-        Cocktail("Orgasme", R.drawable.orgasme, "Tequila"),
-        Cocktail("French 75", R.drawable.french_75, "Gin"),
-        Cocktail("London Mule", R.drawable.london_mule, "Gin"),
-        Cocktail("Dirty martini", R.drawable.dirty_martini, "Vodka"),
-        Cocktail("Sex on the beach", R.drawable.sex_beach, "Vodka"),
-        Cocktail("Bloody Mary", R.drawable.bloody_mary, "Vodka")
+        Cocktail("Mojito", R.drawable.activity3_mojito, "Rhum"),
+        Cocktail("Daïquiri", R.drawable.activity3_daiquiri, "Rhum"),
+        Cocktail("Punch", R.drawable.activity3_punch, "Rhum"),
+        Cocktail("Margarita", R.drawable.activity3_margarita, "Tequila"),
+        Cocktail("Orgasme", R.drawable.activity3_orgasme, "Tequila"),
+        Cocktail("French 75", R.drawable.activity3_french_75, "Gin"),
+        Cocktail("London Mule", R.drawable.activity3_london_mule, "Gin"),
+        Cocktail("Dirty martini", R.drawable.activity3_dirty_martini, "Vodka"),
+        Cocktail("Sex on the beach", R.drawable.activity3_sex_beach, "Vodka"),
+        Cocktail("Bloody Mary", R.drawable.activity3_bloody_mary, "Vodka")
     )
 
     private var currentCocktailIndex = 0
@@ -72,7 +71,7 @@ class Third : Activity() {
         endNextButton.setOnClickListener {
             val resultIntent = Intent()
             resultIntent.putExtra("score", score)
-            setResult(Activity.RESULT_OK, resultIntent)
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
 
@@ -89,9 +88,9 @@ class Third : Activity() {
 
     private fun loadQuestion() {
         setButtonsEnabled(true)
-        point.text = "Score : ${score}"
+        point.text = getString(R.string.score_text, score)
         val cocktail = cocktailsList[currentCocktailIndex]
-        questionTextView.text = "Quel est l'alcool dans ${cocktail.name} ?"
+        questionTextView.text = getString(R.string.question_text, cocktail.name)
         cocktailImageView.setImageResource(cocktail.imageRes)
         correctAnswer = cocktail.correctAlcohol
 
@@ -107,12 +106,10 @@ class Third : Activity() {
     private fun checkAnswer(selectedAnswer: String) {
         countDownTimer.cancel()
         if (selectedAnswer == correctAnswer) {
-            feedbackTextView.text = "Bonne réponse ! 🎉"
-            Toast.makeText(this, "Bonne réponse !", Toast.LENGTH_SHORT).show()
+            feedbackTextView.text = getString(R.string.correct_answer)
             score += 1
         } else {
-            feedbackTextView.text = "Mauvaise réponse... 😞 C'était $correctAnswer"
-            Toast.makeText(this, "Mauvaise réponse !", Toast.LENGTH_SHORT).show()
+            feedbackTextView.text = getString(R.string.wrong_answer)
         }
         setButtonsEnabled(false)
         currentCocktailIndex++
@@ -125,9 +122,9 @@ class Third : Activity() {
         }
     }
     private fun showFinalScore() {
-        questionTextView.text = "Quiz terminé 🎉"
+        questionTextView.text = getString(R.string.quiz_end)
         endScreen.visibility = View.VISIBLE
-        finalScoreText.text = "Votre score final est : $score / ${cocktailsList.size}"
+        finalScoreText.text = getString(R.string.score_final_text, score)
     }
     private fun setButtonsEnabled(enabled: Boolean) {
         choice1.isEnabled = enabled
@@ -136,15 +133,15 @@ class Third : Activity() {
         choice4.isEnabled = enabled
     }
     private fun startTimer() {
-        timer.text = "Temps restant : 5s"
+        timer.text = getString(R.string.time_left,5)
         countDownTimer = object : CountDownTimer(questionTimeInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = millisUntilFinished / 1000
-                timer.text = "Temps restant : $secondsLeft s"
+                timer.text = getString(R.string.time_left,secondsLeft)
             }
 
             override fun onFinish() {
-                feedbackTextView.text = "Temps écoulé ! ⏰ C'était $correctAnswer"
+                feedbackTextView.text = getString(R.string.time_end)
                 setButtonsEnabled(false)
                 currentCocktailIndex++
                 if (currentCocktailIndex < cocktailsList.size) {

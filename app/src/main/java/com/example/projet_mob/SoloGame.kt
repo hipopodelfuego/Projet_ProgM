@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import kotlin.random.Random
 
 class SoloGame : Activity() {
 
@@ -19,7 +18,7 @@ class SoloGame : Activity() {
     private var totalScore = 0
     private lateinit var randomSequence: List<Class<out Activity>>
     private var currentIndex = 0
-    private val REQUEST_CODE = 1234  // un code arbitraire
+    private val coderequest = 1234  // code arbitrary
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,9 +53,9 @@ class SoloGame : Activity() {
     private fun launchNextActivity() {
         if (currentIndex < randomSequence.size) {
             val intent = Intent(this, randomSequence[currentIndex])
-            startActivityForResult(intent, REQUEST_CODE)
+            startActivityForResult(intent, coderequest)
         } else {
-            // 🎉 Fin du jeu aléatoire
+            // Fin du jeu aléatoire
             val intent = Intent(this, FinalScoreActivity::class.java)
             intent.putExtra("totalScore", totalScore)
             startActivity(intent)
@@ -67,7 +66,7 @@ class SoloGame : Activity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == coderequest && resultCode == RESULT_OK) {
             val score = data?.getIntExtra("score", 0) ?: 0
             totalScore += score
             currentIndex++

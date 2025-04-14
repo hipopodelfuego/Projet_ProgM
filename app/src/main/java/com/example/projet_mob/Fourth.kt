@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import kotlin.math.abs
 import kotlin.random.Random
 
 class Fourth : Activity() {
@@ -37,7 +38,7 @@ class Fourth : Activity() {
         nextButton.setOnClickListener {
             val resultIntent = Intent()
             resultIntent.putExtra("score", score)
-            setResult(Activity.RESULT_OK, resultIntent)
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
 
@@ -64,11 +65,10 @@ class Fourth : Activity() {
         isFilling = false
         startButton.isEnabled = false
 
-        score = 100 - Math.abs(targetHeight - fillHeight).toInt()
-        scoreTextView.text = "Score : $score"
+        score = 100 - abs(targetHeight - fillHeight).toInt()
+        scoreTextView.text = getString(R.string.score_text, score)
 
-        // Afficher l'écran de fin
-        finalScoreText.text = "Score final : $score"
+        finalScoreText.text = getString(R.string.score_final_text, score)
         endScreen.visibility = View.VISIBLE
     }
 

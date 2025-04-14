@@ -33,21 +33,27 @@ class Fifth : Activity() {
 
     data class Question(
         val text: String,
-        val options: List<Int>,
         val correctImageRes: Int
     )
 
     private val questions = listOf(
-        Question("Trouve le bar : la maison", listOf(R.drawable.maison, R.drawable.annexe, R.drawable.leptitvelo, R.drawable.vb), R.drawable.maison),
-        Question("Trouve le bar : l'annexe", listOf(R.drawable.annexe, R.drawable.baratin, R.drawable.lezing, R.drawable.uzine), R.drawable.annexe),
-        Question("Trouve le bar : le petit velo", listOf(R.drawable.leptitvelo, R.drawable.lezing, R.drawable.cave, R.drawable.maison), R.drawable.leptitvelo),
-        Question("Trouve le bar : le delirium", listOf(R.drawable.deli, R.drawable.typh, R.drawable.maison, R.drawable.baratin), R.drawable.deli),
-        Question("Trouve le bar : le zing", listOf(R.drawable.lezing, R.drawable.uzine, R.drawable.vb, R.drawable.annexe), R.drawable.lezing),
-        Question("Trouve le bar : le baratin", listOf(R.drawable.baratin, R.drawable.typh, R.drawable.leptitvelo, R.drawable.cave), R.drawable.baratin),
-        Question("Trouve le bar : l'uzine'", listOf(R.drawable.uzine, R.drawable.leptitvelo, R.drawable.baratin, R.drawable.annexe), R.drawable.uzine),
-        Question("Trouve le bar : Tiffany's Pub", listOf(R.drawable.typh, R.drawable.deli, R.drawable.maison, R.drawable.cave), R.drawable.typh),
-        Question("Trouve le bar : la cave à flo", listOf(R.drawable.cave, R.drawable.vb, R.drawable.deli, R.drawable.uzine), R.drawable.cave),
-        Question("Trouve le bar : Le V&B", listOf(R.drawable.vb, R.drawable.uzine, R.drawable.deli, R.drawable.baratin), R.drawable.vb),
+        Question("Trouve le bar : La Maison", R.drawable.activity5_maison),
+        Question("Trouve le bar : l'Annexe", R.drawable.activity5_annexe),
+        Question("Trouve le bar : le Petit Vélo", R.drawable.activity5_leptitvelo),
+        Question("Trouve le bar : le Delirium",  R.drawable.activity5_deli),
+        Question("Trouve le bar : le Zing",  R.drawable.activity5_lezing),
+        Question("Trouve le bar : le Baratin",  R.drawable.activity5_baratin),
+        Question("Trouve le bar : l'Uzine'", R.drawable.activity5_uzine),
+        Question("Trouve le bar : Tiffany's Pub", R.drawable.activity5_typh),
+        Question("Trouve le bar : la cave à flo",  R.drawable.activity5_cave),
+        Question("Trouve le bar : Le V&B", R.drawable.activity5_vb),
+    )
+
+    private val allBarsImages = listOf(
+        R.drawable.activity5_maison, R.drawable.activity5_annexe, R.drawable.activity5_leptitvelo,
+        R.drawable.activity5_vb, R.drawable.activity5_deli, R.drawable.activity5_typh,
+        R.drawable.activity5_lezing, R.drawable.activity5_baratin, R.drawable.activity5_uzine,
+        R.drawable.activity5_cave
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +77,7 @@ class Fifth : Activity() {
         endNextButton.setOnClickListener {
             val resultIntent = Intent()
             resultIntent.putExtra("score", score)
-            setResult(Activity.RESULT_OK, resultIntent)
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
         val options = listOf(option1, option2, option3, option4)
@@ -91,21 +97,17 @@ class Fifth : Activity() {
         questionTextView.text = question.text
         correctImageRes = question.correctImageRes
 
-        val shuffledOptions = question.options.shuffled()
+        //on prend 3 images en plus que l/'on ajoute
+        val wrongOptions = (allBarsImages - correctImageRes).shuffled().take(3)
+        val allOptions = (wrongOptions + correctImageRes).shuffled()
 
-        option1.setImageResource(shuffledOptions[0])
-        option1.tag = shuffledOptions[0]
+        val imageViews = listOf(option1, option2, option3, option4)
+        for (i in imageViews.indices) {
+            imageViews[i].setImageResource(allOptions[i])
+            imageViews[i].tag = allOptions[i]
+        }
 
-        option2.setImageResource(shuffledOptions[1])
-        option2.tag = shuffledOptions[1]
-
-        option3.setImageResource(shuffledOptions[2])
-        option3.tag = shuffledOptions[2]
-
-        option4.setImageResource(shuffledOptions[3])
-        option4.tag = shuffledOptions[3]
-
-        scoreTextView.text = "Score : $score"
+        scoreTextView.text = getString(R.string.score_text, score)
         feedbackTextView.text = ""
 
         startTimer()
@@ -115,11 +117,11 @@ class Fifth : Activity() {
         countDownTimer.cancel()
         setButtonsEnabled(false)
         if (selectedImageRes == correctImageRes) {
-            feedbackTextView.text = "Bonne réponse 🎉"
+            feedbackTextView.text = getString(R.string.correct_answer)
             Toast.makeText(this, "Correct !", Toast.LENGTH_SHORT).show()
             score++
         } else {
-            feedbackTextView.text = "Mauvaise réponse 😞"
+            feedbackTextView.text = getString(R.string.wrong_answer)
             Toast.makeText(this, "Incorrect", Toast.LENGTH_SHORT).show()
         }
 
@@ -133,9 +135,9 @@ class Fifth : Activity() {
         }
     }
     private fun showEndScreen() {
-        questionTextView.text = "🎉 Quiz terminé !"
+        questionTextView.text = getString(R.string.quiz_end)
         findViewById<LinearLayout>(R.id.endScreen).visibility = LinearLayout.VISIBLE
-        finalScoreText.text = "Votre score final est : $score"
+        finalScoreText.text = getString(R.string.score_final_text, score)
         scoreTextView.visibility= View.GONE
     }
 
@@ -147,16 +149,17 @@ class Fifth : Activity() {
     }
 
     private fun startTimer() {
-        timer.text = "Temps restant : 5s"
+        timer.text = getString(R.string.time_left, 5)
+
 
         countDownTimer = object : CountDownTimer(questionTimeInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = millisUntilFinished / 1000
-                timer.text = "Temps restant : $secondsLeft s"
+                timer.text = getString(R.string.time_left,secondsLeft)
             }
 
             override fun onFinish() {
-                feedbackTextView.text = "Temps écoulé ! ⏰"
+                feedbackTextView.text = getString(R.string.time_end)
                 setButtonsEnabled(false)
                 currentQuestionIndex++
                 if (currentQuestionIndex < questions.size) {
