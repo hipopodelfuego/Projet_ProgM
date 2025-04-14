@@ -32,6 +32,7 @@ class Fourth : Activity() {
         glassView = findViewById(R.id.glassView)
         startButton = findViewById(R.id.startButton)
         scoreTextView = findViewById(R.id.scoreTextView)
+        scoreTextView.text = getString(R.string.score_text, 0)
         endScreen = findViewById(R.id.endScreen)
         finalScoreText = findViewById(R.id.finalScoreText)
         nextButton = findViewById(R.id.nextButton)

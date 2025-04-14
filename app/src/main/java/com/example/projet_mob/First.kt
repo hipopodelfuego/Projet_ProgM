@@ -40,6 +40,7 @@ class First : Activity(), SensorEventListener {
 
         glassImageView = findViewById(R.id.glassImageView)
         scoreTextView = findViewById(R.id.scoreTextView)
+        scoreTextView.text = getString(R.string.score_text, 0)
         finalScoreText = findViewById(R.id.finalScoreText)
         nextButton = findViewById(R.id.nextButton)
         endScreen = findViewById(R.id.endScreen)

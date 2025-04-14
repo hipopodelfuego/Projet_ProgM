@@ -36,6 +36,7 @@ class Sixth : Activity() {
         setContentView(R.layout.activity_sixth)
 
         scoreText = findViewById(R.id.scoreText)
+        scoreText.text = getString(R.string.score_text, 0)
         fanImage = findViewById(R.id.fanImage)
         endScreen = findViewById(R.id.endScreen)
         finalScoreText = findViewById(R.id.finalScoreText)
