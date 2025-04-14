@@ -47,6 +47,7 @@ class SoloGame : Activity() {
         findViewById<Button>(R.id.btnRandom).setOnClickListener {
             randomSequence = activities.shuffled().take(3)
             currentIndex = 0
+            totalScore = 0
             launchNextActivity()
         }
     }
