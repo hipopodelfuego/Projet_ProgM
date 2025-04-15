@@ -1,4 +1,4 @@
-package com.example.projet_mob
+package com.example.projet_mob.activity
 
 import android.content.Context
 import android.graphics.Canvas

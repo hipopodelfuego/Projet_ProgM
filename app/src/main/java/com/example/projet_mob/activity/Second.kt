@@ -1,4 +1,4 @@
-package com.example.projet_mob
+package com.example.projet_mob.activity
 
 import android.os.Vibrator
 import android.os.VibrationEffect
@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.projet_mob.R
 import kotlin.random.Random
 
 class Second : Activity(), GestureDetector.OnGestureListener {

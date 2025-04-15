@@ -26,22 +26,23 @@
         </activity>
         <activity android:name=".MultiplayerMenu"/>
         <activity android:name=".SoloGame"/>
-        <activity android:name=".First"/>
-        <activity android:name=".Second"/>
-        <activity android:name=".Fourth"/>
-        <activity android:name=".GlassView"/>
-        <activity android:name=".Third"/>
-        <activity android:name=".Fifth"/>
-        <activity android:name=".Sixth"/>
+        <activity android:name=".activity.First"/>
+        <activity android:name=".activity.Second"/>
+        <activity android:name=".activity.Fourth"/>
+        <activity android:name=".activity.Third"/>
+        <activity android:name=".activity.Fifth"/>
+        <activity android:name=".activity.Sixth"/>
         <activity android:name=".FinalScoreActivity"/>
     </application>
 
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE"/>
 
 </manifest>

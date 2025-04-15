@@ -4,6 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import com.example.projet_mob.activity.Fifth
+import com.example.projet_mob.activity.First
+import com.example.projet_mob.activity.Fourth
+import com.example.projet_mob.activity.Second
+import com.example.projet_mob.activity.Sixth
+import com.example.projet_mob.activity.Third
 
 class SoloGame : Activity() {
 

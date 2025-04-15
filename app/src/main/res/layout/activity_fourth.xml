@@ -11,7 +11,7 @@
         android:gravity="center"
         android:padding="20dp">
 
-        <com.example.projet_mob.GlassView
+        <com.example.projet_mob.activity.GlassView
             android:id="@+id/glassView"
             android:layout_width="match_parent"
             android:layout_height="400dp" />

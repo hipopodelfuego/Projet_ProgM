@@ -1,4 +1,4 @@
-package com.example.projet_mob
+package com.example.projet_mob.activity
 
 import android.app.Activity
 import android.content.Intent
@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.LinearLayout
+import com.example.projet_mob.R
 
 class Third : Activity() {
 

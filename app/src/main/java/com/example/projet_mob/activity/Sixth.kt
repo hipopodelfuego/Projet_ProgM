@@ -1,4 +1,4 @@
-package com.example.projet_mob
+package com.example.projet_mob.activity
 
 import android.app.Activity
 import android.media.MediaRecorder
@@ -14,6 +14,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.projet_mob.R
 import java.io.File
 
 class Sixth : Activity() {
