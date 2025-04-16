@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.BroadcastReceiver
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -62,11 +63,19 @@ class BluetoothManager(val context: Activity) {
 
     // Vérification et demande de permissions Bluetooth
     fun checkPermissions() {
-        val permissions = arrayOf(
-            Manifest.permission.BLUETOOTH,
-            Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
+        val permissions = mutableListOf<String>()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android 12+ : il faut ces permissions spécifiques
+            permissions.add(Manifest.permission.BLUETOOTH_SCAN)
+            permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+            permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE)
+        } else {
+            // Android < 12
+            permissions.add(Manifest.permission.BLUETOOTH)
+            permissions.add(Manifest.permission.BLUETOOTH_ADMIN)
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
 
         val permissionsNeeded = permissions.filter {
             ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
@@ -79,6 +88,7 @@ class BluetoothManager(val context: Activity) {
             Log.d("Bluetooth", "Toutes les permissions Bluetooth sont déjà accordées.")
         }
     }
+
 
 
     // Activer Bluetooth si nécessaire
