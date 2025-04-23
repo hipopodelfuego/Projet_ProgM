@@ -1,5 +1,6 @@
 package com.example.projet_mob.bluetooth
 
+import MultiplayerGameActivity
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.*
@@ -29,7 +30,7 @@ class MyBluetoothService(
 ) {
     val bluetoothAdapter: BluetoothAdapter
     private val discoveredDevices = mutableStateListOf<BluetoothDevice>()
-    private var deviceFoundCallback: ((String) -> Unit)? = null
+    private var deviceFoundCallback: ((String, String) -> Unit)? = null
     private var advertiseCallback: AdvertiseCallback? = null
     private var advertiseTimer: CountDownTimer? = null
 
@@ -40,8 +41,7 @@ class MyBluetoothService(
                 device?.let {
                     if (!discoveredDevices.contains(it)) {
                         discoveredDevices.add(it)
-                        val nameOrAddress = it.name?.let { name -> "$name - ${it.address}" } ?: it.address
-                        deviceFoundCallback?.invoke(nameOrAddress)
+                        deviceFoundCallback?.invoke(it.name ?: "Unknown", it.address)
                     }
                 }
             }
@@ -93,56 +93,117 @@ class MyBluetoothService(
 
     fun startDiscovery() {
         try {
+            // Vérifie si la permission pour scanner les appareils est accordée
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
                 if (bluetoothAdapter.isDiscovering) bluetoothAdapter.cancelDiscovery()
                 discoveredDevices.clear()
                 bluetoothAdapter.startDiscovery()
             } else {
                 Toast.makeText(context, "Permission de scan manquante", Toast.LENGTH_SHORT).show()
-                checkPermissions()
+                checkBluetoothPermissions()  // Vérifier et demander les permissions
             }
         } catch (e: SecurityException) {
             Log.e("Bluetooth", "Erreur de permission lors de la découverte", e)
         }
     }
 
-    fun setOnDeviceFoundListener(callback: (String) -> Unit) {
+
+    fun setOnDeviceFoundListener(callback: (String, String) -> Unit) {
         this.deviceFoundCallback = callback
     }
 
     fun connectToDevice(device: BluetoothDevice) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             Toast.makeText(context, "Permission Bluetooth manquante", Toast.LENGTH_SHORT).show()
             checkPermissions()
             return
         }
 
+        val socket: BluetoothSocket?
         try {
-            device.uuids?.forEach { Log.d("Bluetooth", "UUID disponible: ${it.uuid}") }
+            socket = device.createRfcommSocketToServiceRecord(SPP_UUID)
+        } catch (e: IOException) {
+            Log.e("Bluetooth", "Erreur lors de la création du socket", e)
+            return
+        }
 
-            val socket = device.createRfcommSocketToServiceRecord(SPP_UUID)
+        Thread {
+            try {
+                bluetoothAdapter.cancelDiscovery()
+                socket.connect()
+                connectedSocket = socket
 
-            Thread {
-                try {
-                    bluetoothAdapter.cancelDiscovery()
-                    socket.connect()
-                    Log.d("Bluetooth", "Connecté à ${device.name}")
-
-                    val outputStream = socket.outputStream
+// Ajouter gestion des messages entrants
+                Thread {
                     val inputStream = socket.inputStream
-                    outputStream.write("Hello, Bluetooth!".toByteArray())
-
                     val buffer = ByteArray(1024)
                     while (true) {
                         val bytes = inputStream.read(buffer)
-                        // Gérer les données reçues...
+                        if (bytes > 0) {
+                            val message = String(buffer, 0, bytes)
+                            Log.d("Bluetooth", "Message reçu (client) : $message")
+                            handleMessage(message)
+                        }
                     }
-                } catch (e: IOException) {
-                    Log.e("Bluetooth", "Erreur de connexion", e)
+                }.start()
+
+                context.runOnUiThread {
+                    Toast.makeText(context, "Connecté à ${device.name}", Toast.LENGTH_SHORT).show()
                 }
-            }.start()
-        } catch (e: Exception) {
-            Log.e("Bluetooth", "Erreur lors de la connexion", e)
+                Log.d("Bluetooth", "Connecté à ${device.name}")
+
+            } catch (e: IOException) {
+                Log.e("Bluetooth", "Erreur de connexion", e)
+                context.runOnUiThread {
+                    Toast.makeText(context, "Échec de connexion à ${device.name}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
+    }
+
+    fun startListeningForConnections() {
+        val serverSocket: BluetoothServerSocket? = bluetoothAdapter.listenUsingRfcommWithServiceRecord("BluetoothGame", SPP_UUID)
+        Thread {
+            try {
+                val socket = serverSocket?.accept() // Attendre la connexion entrante
+                if (socket != null) {
+                    Log.d("Bluetooth", "Connexion acceptée avec ${socket.remoteDevice.name}")
+                    acceptConnection(socket)
+                }
+            } catch (e: IOException) {
+                Log.e("Bluetooth", "Erreur de connexion", e)
+            }
+        }.start()
+    }
+
+    // Fonction pour gérer la connexion acceptée
+    fun acceptConnection(socket: BluetoothSocket) {
+        val inputStream = socket.inputStream
+        val outputStream = socket.outputStream
+        connectedSocket = socket
+
+        val buffer = ByteArray(1024)
+        while (true) {
+            val bytesRead = inputStream.read(buffer)
+            if (bytesRead > 0) {
+                // Traiter les données reçues
+                val message = String(buffer, 0, bytesRead)
+                Log.d("Bluetooth", "Message reçu : $message")
+
+                // Répondre avec une confirmation ou autre action
+                outputStream.write("Réponse du serveur".toByteArray())
+            }
+            val message = String(buffer, 0, bytesRead)
+            Log.d("Bluetooth", "Message reçu (serveur) : $message")
+
+            context.runOnUiThread {
+                Toast.makeText(context, "Serveur a reçu : $message", Toast.LENGTH_SHORT).show()
+            }
+
+            handleMessage(message)
+
         }
     }
 
@@ -214,4 +275,69 @@ class MyBluetoothService(
     fun unregisterReceiver() {
         context.unregisterReceiver(discoveryReceiver)
     }
+
+    fun checkBluetoothPermissions() {
+        // Permissions Bluetooth nécessaires
+        val permissions = mutableListOf<String>().apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                add(Manifest.permission.BLUETOOTH_SCAN)
+                add(Manifest.permission.BLUETOOTH_CONNECT)
+                add(Manifest.permission.BLUETOOTH_ADVERTISE)
+            } else {
+                add(Manifest.permission.BLUETOOTH)
+                add(Manifest.permission.BLUETOOTH_ADMIN)
+                add(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+
+        // Vérifier si les permissions sont accordées
+        val neededPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        // Si des permissions sont manquantes, demander la permission
+        if (neededPermissions.isNotEmpty()) {
+            Log.d("Bluetooth", "Permissions manquantes : ${neededPermissions.joinToString()}")
+            requestBluetoothPermissionsLauncher.launch(neededPermissions.toTypedArray())
+        } else {
+            Log.d("Bluetooth", "Toutes les permissions Bluetooth sont déjà accordées.")
+        }
+    }
+
+    private var connectedSocket: BluetoothSocket? = null
+
+    fun sendMessage(message: String) {
+        try {
+            connectedSocket?.outputStream?.write(message.toByteArray())
+            Log.d("Bluetooth", "Message envoyé : $message")
+        } catch (e: IOException) {
+            Log.e("Bluetooth", "Erreur lors de l'envoi du message", e)
+        }
+    }
+    private fun handleMessage(message: String) {
+        when {
+            message.startsWith("START_GAME:") -> {
+                val ids = message.removePrefix("START_GAME:")
+                    .split(",").mapNotNull { it.toIntOrNull() }
+
+                val intent = Intent(context, MultiplayerGameActivity::class.java)
+                intent.putExtra("challenge_ids", ids.toIntArray())
+                context.startActivity(intent)
+            }
+
+            message.startsWith("SCORE:") -> {
+                val opponentScore = message.removePrefix("SCORE:").toIntOrNull() ?: return
+                MultiplayerGameActivity.setOpponentScore(opponentScore)
+            }
+
+            message == "WINNER" -> {
+                MultiplayerGameActivity.setVictory(true)
+            }
+
+            message == "LOSER" -> {
+                MultiplayerGameActivity.setVictory(false)
+            }
+        }
+    }
+
 }

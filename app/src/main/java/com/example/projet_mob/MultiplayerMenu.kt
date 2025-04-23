@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.projet_mob.bluetooth.MyBluetoothService
+import com.example.projet_mob.activity.*
+import com.example.projet_mob.bluetooth.BluetoothManager
 
 class MultiplayerMenu : ComponentActivity() {
     private lateinit var myBluetoothService: MyBluetoothService
@@ -22,6 +24,15 @@ class MultiplayerMenu : ComponentActivity() {
     private lateinit var deviceListView: ListView
     private lateinit var deviceAdapter: ArrayAdapter<String>
     private val deviceNames = mutableListOf<String>()
+    private val deviceAddresses = mutableListOf<String>()
+    private val activityMap = listOf(
+        First::class.java,
+        Second::class.java,
+        Third::class.java,
+        Fourth::class.java,
+        Fifth::class.java,
+        Sixth::class.java
+    )
 
 
     private val requestEnableBluetoothLauncher =
@@ -42,6 +53,7 @@ class MultiplayerMenu : ComponentActivity() {
         val timerTextView = findViewById<TextView>(R.id.timerTextView)
 
         myBluetoothService = MyBluetoothService(this, timerTextView)
+        BluetoothManager.bluetoothService = myBluetoothService
         myBluetoothService.checkPermissions()
 
         isBluetoothEnabled = myBluetoothService.bluetoothAdapter.isEnabled
@@ -55,6 +67,13 @@ class MultiplayerMenu : ComponentActivity() {
         deviceAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, deviceNames)
         deviceListView.adapter = deviceAdapter
 
+        val btnStartGame = findViewById<Button>(R.id.btnStartGame)
+        btnStartGame.setOnClickListener {
+            val randomIds = listOf(0, 1, 2, 3, 4, 5).shuffled().take(3)
+            val startGameMessage = "START_GAME:${randomIds.joinToString(",")}"
+            myBluetoothService.sendMessage(startGameMessage)
+        }
+
         btnEnableBluetooth.setOnClickListener {
             enableBluetooth()
         }
@@ -64,16 +83,24 @@ class MultiplayerMenu : ComponentActivity() {
         }
 
         btnStartAdvertising.setOnClickListener {
+            myBluetoothService.startListeningForConnections()
             myBluetoothService.startAdvertising()
         }
 
         updateUIVisibility()
-        myBluetoothService.setOnDeviceFoundListener { deviceName ->
+        myBluetoothService.setOnDeviceFoundListener { deviceName, deviceAddress ->
             runOnUiThread {
-                onDeviceFound(deviceName)
+                onDeviceFound(deviceName, deviceAddress)
             }
         }
 
+        // Connexion à l'appareil sélectionné
+        deviceListView.setOnItemClickListener { _, _, position, _ ->
+            val deviceAddress = deviceAddresses[position]
+            val device = myBluetoothService.bluetoothAdapter.getRemoteDevice(deviceAddress)
+            Toast.makeText(this, "Connexion à ${device.name ?: device.address}...", Toast.LENGTH_SHORT).show()
+            myBluetoothService.connectToDevice(device) // Tente de se connecter à l'appareil
+        }
     }
 
     private fun updateUIVisibility() {
@@ -97,15 +124,17 @@ class MultiplayerMenu : ComponentActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        myBluetoothService.unregisterReceiver()
-    }
-    fun onDeviceFound(deviceName: String) {
+    // Ajouter un appareil à la liste
+    fun onDeviceFound(deviceName: String, deviceAddress: String) {
         if (!deviceNames.contains(deviceName)) {
             deviceNames.add(deviceName)
+            deviceAddresses.add(deviceAddress) // Ajoutez l'adresse aussi
             deviceAdapter.notifyDataSetChanged()
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        myBluetoothService.unregisterReceiver()
+    }
 }

@@ -55,6 +55,19 @@
         android:layout_marginTop="20dp"
         android:visibility="gone" />
 
+
+    <Button
+        android:id="@+id/btnStartGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Démarrer la partie"
+        android:padding="10dp"
+        android:backgroundTint="#FFD700"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone" />
+
     <!-- Bouton pour démarrer la découverte des appareils Bluetooth -->
     <Button
         android:id="@+id/btnStartDiscovery"
