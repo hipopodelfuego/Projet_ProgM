@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="#F5F5DC"> <!-- Couleur beige -->
+
+    <!-- Titre de l'application -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bluetooth_title"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="30dp"
+        android:textColor="#8B4513"/>
+
+    <!-- Bouton pour activer le Bluetooth -->
+    <Button
+        android:id="@+id/btnEnableBluetooth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Activer Bluetooth"
+        android:padding="10dp"
+        android:backgroundTint="#FFD700"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone"/> <!-- Par défaut invisible, sera visible si Bluetooth désactivé -->
+
+    <!-- Affichage du temps restant d'aspiration -->
+    <TextView
+        android:id="@+id/timerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Temps restant : 60s"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#8B0000"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btnStartAdvertising"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Démarrer le mode serveur"
+        android:padding="10dp"
+        android:backgroundTint="#FFD700"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone" />
+
+    <!-- Bouton pour démarrer la découverte des appareils Bluetooth -->
+    <Button
+        android:id="@+id/btnStartDiscovery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Démarrer la découverte"
+        android:padding="10dp"
+        android:backgroundTint="#FFD700"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Liste des appareils découverts -->
+    <ListView
+        android:id="@+id/bluetoothDeviceList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="0.5dp"
+        android:paddingTop="10dp" />
+</LinearLayout>

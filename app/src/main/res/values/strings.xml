@@ -61,4 +61,7 @@
     <string name="score_cumul_text">Votre score cumulé sur les 3 activites est : %1$d</string>
     <string name="back_menu">Retour au menu</string>
 
+    <!-- Mutliplayer -->
+    <string name="bluetooth_title">Menu Bluetooth</string>
+
 </resources>
