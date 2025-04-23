@@ -17,8 +17,12 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
+import com.example.projet_mob.MultiplayerGameActivity
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.*
 
 val SPP_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
@@ -46,6 +50,14 @@ class MyBluetoothService(
                 }
             }
         }
+    }
+
+    private var connectedThread: ConnectedThread? = null
+    private var connectionState = mutableStateOf(BluetoothState.DISCONNECTED)
+    private var connectionCallback: ((BluetoothState) -> Unit)? = null
+
+    enum class BluetoothState {
+        DISCONNECTED, CONNECTING, CONNECTED, ERROR
     }
 
     private val requestBluetoothPermissionsLauncher: ActivityResultLauncher<Array<String>> =
@@ -117,32 +129,80 @@ class MyBluetoothService(
             return
         }
 
-        try {
-            device.uuids?.forEach { Log.d("Bluetooth", "UUID disponible: ${it.uuid}") }
+        connectionState.value = BluetoothState.CONNECTING
+        connectionCallback?.invoke(connectionState.value)
 
-            val socket = device.createRfcommSocketToServiceRecord(SPP_UUID)
+        Thread {
+            try {
+                val socket = device.createRfcommSocketToServiceRecord(SPP_UUID)
+                bluetoothAdapter.cancelDiscovery()
+                socket.connect()
 
-            Thread {
-                try {
-                    bluetoothAdapter.cancelDiscovery()
-                    socket.connect()
-                    Log.d("Bluetooth", "Connecté à ${device.name}")
+                connectedThread = ConnectedThread(socket).apply { start() }
+                connectionState.value = BluetoothState.CONNECTED
+                connectionCallback?.invoke(connectionState.value)
 
-                    val outputStream = socket.outputStream
-                    val inputStream = socket.inputStream
-                    outputStream.write("Hello, Bluetooth!".toByteArray())
-
-                    val buffer = ByteArray(1024)
-                    while (true) {
-                        val bytes = inputStream.read(buffer)
-                        // Gérer les données reçues...
-                    }
-                } catch (e: IOException) {
-                    Log.e("Bluetooth", "Erreur de connexion", e)
+                // Lancer l'activité de jeu après connexion réussie
+                context.runOnUiThread {
+                    Toast.makeText(context, "Connecté à ${device.name}", Toast.LENGTH_LONG).show()
+                    startMultiplayerGame()
                 }
-            }.start()
-        } catch (e: Exception) {
-            Log.e("Bluetooth", "Erreur lors de la connexion", e)
+
+            } catch (e: Exception) {
+                Log.e("Bluetooth", "Erreur de connexion", e)
+                connectionState.value = BluetoothState.ERROR
+                connectionCallback?.invoke(connectionState.value)
+            }
+        }.start()
+    }
+
+    fun setConnectionCallback(callback: (BluetoothState) -> Unit) {
+        this.connectionCallback = callback
+    }
+
+    // Ajoutez cette classe interne pour gérer la communication
+    private inner class ConnectedThread(private val socket: BluetoothSocket) : Thread() {
+        private val inputStream: InputStream = socket.inputStream
+        private val outputStream: OutputStream = socket.outputStream
+        private val buffer = ByteArray(1024)
+
+        override fun run() {
+            while (true) {
+                try {
+                    val bytes = inputStream.read(buffer)
+                    val message = String(buffer, 0, bytes)
+                    // Traiter les messages reçus
+                    handleIncomingMessage(message)
+                } catch (e: IOException) {
+                    break
+                }
+            }
+        }
+
+        fun write(message: String) {
+            try {
+                outputStream.write(message.toByteArray())
+            } catch (e: IOException) {
+                Log.e("Bluetooth", "Erreur d'écriture", e)
+            }
+        }
+    }
+
+    // Pour envoyer des messages
+    fun sendGameMessage(message: String) {
+        connectedThread?.write(message)
+    }
+
+    // Pour recevoir des messages
+    private fun handleIncomingMessage(message: String) {
+        when (message) {
+            "START_GAME" -> {
+                context.runOnUiThread {
+                    Toast.makeText(context, "Le jeu commence!", Toast.LENGTH_SHORT).show()
+                    // Mettre à jour l'UI ou l'état du jeu
+                }
+            }
+            // Ajoutez d'autres commandes de jeu ici
         }
     }
 
@@ -213,5 +273,12 @@ class MyBluetoothService(
 
     fun unregisterReceiver() {
         context.unregisterReceiver(discoveryReceiver)
+    }
+
+    private fun startMultiplayerGame() {
+        val intent = Intent(context, MultiplayerGameActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        context.startActivity(intent)
     }
 }
