@@ -3,6 +3,7 @@ package com.example.projet_mob
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.ArrayAdapter
 import android.widget.ListView
@@ -68,6 +69,15 @@ class MultiplayerMenu : ComponentActivity() {
         deviceListView.adapter = deviceAdapter
 
         val btnStartGame = findViewById<Button>(R.id.btnStartGame)
+        btnStartGame.visibility = View.GONE
+
+// ⬇️ Définir le callback de connexion Bluetooth
+        myBluetoothService.onConnectedCallback = {
+            runOnUiThread {
+                btnStartGame.visibility = View.VISIBLE // 👈 Affiche le bouton une fois connecté
+            }
+        }
+
         btnStartGame.setOnClickListener {
             val randomIds = listOf(0, 1, 2, 3, 4, 5).shuffled().take(3)
             val startGameMessage = "START_GAME:${randomIds.joinToString(",")}"
