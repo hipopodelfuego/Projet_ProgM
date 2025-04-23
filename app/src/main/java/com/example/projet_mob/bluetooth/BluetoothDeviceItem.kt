@@ -16,27 +16,36 @@ import androidx.core.content.ContextCompat
 fun BluetoothDeviceItem(
     device: BluetoothDevice,
     context: Context,
-    bluetoothManager: BluetoothManager
+    myBluetoothService: MyBluetoothService
 ) {
     val hasPermission = ContextCompat.checkSelfPermission(
         context,
         Manifest.permission.BLUETOOTH_CONNECT
     ) == android.content.pm.PackageManager.PERMISSION_GRANTED
 
+    val deviceName = try {
+        device.name ?: "Inconnu"
+    } catch (e: Exception) {
+        "Inconnu"
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
                 if (hasPermission) {
-                    bluetoothManager.connectToDevice(device)
+                    myBluetoothService.connectToDevice(device)
                 } else {
                     Toast.makeText(context, "Permission Bluetooth manquante", Toast.LENGTH_SHORT).show()
                 }
             },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = if (hasPermission) device.name ?: "Inconnu" else "Permission requise")
-        Text(text = if (hasPermission) device.address else "Permission requise")
+        Column {
+            Text(text = if (hasPermission) deviceName else "Permission requise")
+            if (hasPermission) {
+                Text(text = device.address)
+            }
+        }
     }
 }

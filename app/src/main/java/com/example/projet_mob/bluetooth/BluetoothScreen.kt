@@ -1,7 +1,6 @@
 package com.example.projet_mob.bluetooth
 
 import android.bluetooth.BluetoothDevice
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,11 +16,10 @@ fun BluetoothScreen(
     isBluetoothEnabled: Boolean,
     onEnableBluetooth: () -> Unit,
     onStartDiscovery: () -> Unit,
+    onStartAdvertising: () -> Unit,  // Fonction pour activer le mode aspirage
     discoveredDevices: List<BluetoothDevice>,
-    bluetoothManager: BluetoothManager
+    myBluetoothService: MyBluetoothService
 ) {
-    val hasBluetoothPermissions = bluetoothManager.hasBluetoothPermissions() // Vérification des permissions
-
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -29,8 +27,16 @@ fun BluetoothScreen(
         Text("Bluetooth Devices")
 
         if (isBluetoothEnabled) {
+            // Bouton pour démarrer la découverte
             Button(onClick = { onStartDiscovery() }) {
                 Text("Start Discovery")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Bouton pour activer le mode aspirage
+            Button(onClick = { onStartAdvertising() }) {
+                Text("Enable Advertising (Aspirage Mode)")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -38,16 +44,11 @@ fun BluetoothScreen(
             // Affichage des appareils Bluetooth découverts
             LazyColumn {
                 items(discoveredDevices) { device ->
-                    BluetoothDeviceItem(device, bluetoothManager.context, bluetoothManager) // Pass context
+                    BluetoothDeviceItem(device, myBluetoothService.context, myBluetoothService) // Pass context
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Démarrer l'écoute (mode serveur)
-            Button(onClick = { bluetoothManager.startListening() }) {
-                Text("Start Listening (Server Mode)")
-            }
 
         } else {
             Button(onClick = { onEnableBluetooth() }) {
