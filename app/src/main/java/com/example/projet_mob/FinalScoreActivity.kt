@@ -26,6 +26,13 @@ class FinalScoreActivity : Activity() {
         button.setOnClickListener {
             finish() //revenir au menu principal
         }
+        val won = intent.getBooleanExtra("won", false)
+        if (won) {
+            MediaPlayer.create(this, R.raw.victory).start()
+        } else {
+            MediaPlayer.create(this, R.raw.defeat).start()
+        }
+
     }
     override fun onDestroy() {
         super.onDestroy()

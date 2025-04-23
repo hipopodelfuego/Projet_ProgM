@@ -34,7 +34,7 @@ fun BluetoothDeviceItem(
             .padding(8.dp)
             .clickable {
                 if (hasPermission) {
-                    myBluetoothService.connectToDevice(device)
+                    myBluetoothService.connectToDevice(device) // Connexion à l'appareil
                 } else {
                     Toast.makeText(context, "Permission Bluetooth manquante", Toast.LENGTH_SHORT).show()
                 }
