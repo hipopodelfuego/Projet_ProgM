@@ -1,0 +1,68 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp"
+        android:background="#F5F5DC">
+
+        <TextView
+            android:id="@+id/timerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/time_left"
+            android:textSize="24sp"
+            android:textColor="#000"
+            android:layout_marginBottom="10dp"
+            android:gravity="center" />
+
+        <ImageView
+            android:id="@+id/bottleImageView"
+            android:layout_width="200dp"
+            android:layout_height="300dp"
+            android:contentDescription="@string/bouteille"
+            android:src="@drawable/activity2_bouteille_bouchon"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            android:id="@+id/scoreTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/score_text"
+            android:textSize="24sp"
+            android:textColor="#000"
+            android:layout_marginBottom="10dp"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/endScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:background="#AA000000">
+
+        <TextView
+            android:id="@+id/finalScoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/score_final_text"
+            android:textSize="24sp"
+            android:textColor="#FFFFFF"
+            android:padding="16dp" />
+
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/next_button" />
+    </LinearLayout>
+
+</FrameLayout>

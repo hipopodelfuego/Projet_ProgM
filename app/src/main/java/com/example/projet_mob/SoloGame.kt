@@ -1,0 +1,83 @@
+package com.example.projet_mob
+
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import com.example.projet_mob.activity.Fifth
+import com.example.projet_mob.activity.First
+import com.example.projet_mob.activity.Fourth
+import com.example.projet_mob.activity.Second
+import com.example.projet_mob.activity.Sixth
+import com.example.projet_mob.activity.Third
+
+class SoloGame : Activity() {
+
+    private val activities = listOf(
+        First::class.java,
+        Second::class.java,
+        Third::class.java,
+        Fourth::class.java,
+        Fifth::class.java,
+        Sixth::class.java
+    )
+    private var totalScore = 0
+    private lateinit var randomSequence: List<Class<out Activity>>
+    private var currentIndex = 0
+    private val coderequest = 1234  // code arbitrary
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_sologame)
+
+        findViewById<Button>(R.id.btn1).setOnClickListener {
+            startActivity(Intent(this, First::class.java))
+        }
+        findViewById<Button>(R.id.btn2).setOnClickListener {
+            startActivity(Intent(this, Second::class.java))
+        }
+        findViewById<Button>(R.id.btn3).setOnClickListener {
+            startActivity(Intent(this, Third::class.java))
+        }
+        findViewById<Button>(R.id.btn4).setOnClickListener {
+            startActivity(Intent(this, Fourth::class.java))
+        }
+        findViewById<Button>(R.id.btn5).setOnClickListener {
+            startActivity(Intent(this, Fifth::class.java))
+        }
+        findViewById<Button>(R.id.btn6).setOnClickListener {
+            startActivity(Intent(this, Sixth::class.java))
+        }
+
+        findViewById<Button>(R.id.btnRandom).setOnClickListener {
+            randomSequence = activities.shuffled().take(3)
+            currentIndex = 0
+            totalScore = 0
+            launchNextActivity()
+        }
+    }
+
+    private fun launchNextActivity() {
+        if (currentIndex < randomSequence.size) {
+            val intent = Intent(this, randomSequence[currentIndex])
+            startActivityForResult(intent, coderequest)
+        } else {
+            // Fin du jeu aléatoire
+            val intent = Intent(this, FinalScoreActivity::class.java)
+            intent.putExtra("totalScore", totalScore)
+            startActivity(intent)
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == coderequest && resultCode == RESULT_OK) {
+            val score = data?.getIntExtra("score", 0) ?: 0
+            totalScore += score
+            currentIndex++
+            launchNextActivity()
+        }
+    }
+}
