@@ -18,6 +18,8 @@ object MultiplayerGameState {
     }
 
     fun isWinner(): Boolean {
-        return (localScore ?: 0) > (opponentScore ?: 0)
+        val local = localScore ?: return false
+        val opponent = opponentScore ?: return false
+        return local >= opponent
     }
 }

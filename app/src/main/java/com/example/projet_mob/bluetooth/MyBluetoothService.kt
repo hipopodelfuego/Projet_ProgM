@@ -360,13 +360,16 @@ class MyBluetoothService(
                         }
                     }
 
+
                     singleMessage == "WINNER" -> {
                         MultiplayerGameActivity.setVictory(false)
                     }
 
                     singleMessage == "LOSER" -> {
+                        Log.d("Bluetooth", "Message LOSER reçu dans MyBluetoothService")
                         MultiplayerGameActivity.setVictory(true)
                     }
+
                 }
             }
         }

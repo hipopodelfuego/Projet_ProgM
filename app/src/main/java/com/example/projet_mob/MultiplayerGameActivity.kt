@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.example.projet_mob.activity.*
-import com.example.projet_mob.ui.theme.BluetoothManager
+import com.example.projet_mob.bluetooth.BluetoothManager
 
 class MultiplayerGameActivity : Activity() {
 
@@ -81,6 +81,12 @@ class MultiplayerGameActivity : Activity() {
                     Log.d("GameFlow", "Final screen déjà affiché, message de victoire/perte ignoré.")
                 }
             }
+        }
+        if (MultiplayerGameState.bothScoresReceived() && !MultiplayerGameState.victorySent) {
+            MultiplayerGameState.victorySent = true
+            val won = MultiplayerGameState.localScore!! >= MultiplayerGameState.opponentScore!!
+            BluetoothManager.bluetoothService?.sendMessage(if (won) "WINNER" else "LOSER")
+            showFinalScreen(won)
         }
     }
 

@@ -57,3 +57,7 @@ fun BluetoothScreen(
         }
     }
 }
+
+object BluetoothManager {
+    lateinit var bluetoothService: MyBluetoothService
+}
