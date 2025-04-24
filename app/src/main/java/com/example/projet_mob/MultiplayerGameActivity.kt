@@ -6,8 +6,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import com.example.projet_mob.activity.*
-import com.example.projet_mob.bluetooth.BluetoothManager
+import com.example.projet_mob.ui.theme.BluetoothManager
 
 class MultiplayerGameActivity : Activity() {
 
@@ -41,8 +42,12 @@ class MultiplayerGameActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_multiplayer_game)
-        BluetoothManager.bluetoothService?.onMessageReceivedCallback = { message ->
-            handleBluetoothMessage(message)
+        BluetoothManager.bluetoothService?.apply {
+            onMessageReceivedCallback = { message ->
+                runOnUiThread {
+                    handleBluetoothMessage(message)
+                }
+            }
         }
         val ids = intent.getIntArrayExtra("challenge_ids") ?: intArrayOf(0, 1, 2)
         challengeSequence = ids.map { activityMap[it] }
@@ -94,47 +99,61 @@ class MultiplayerGameActivity : Activity() {
         }
     }
     fun endGameWithScore(score: Int) {
-        MultiplayerGameState.localScore = score
-        BluetoothManager.bluetoothService?.sendMessage("SCORE:$score")
+        runOnUiThread {
+            MultiplayerGameState.localScore = score
+            BluetoothManager.bluetoothService?.sendMessage("SCORE:$score")
 
-        tryFinishGame()
+            // Afficher le score local immédiatement
+            Toast.makeText(
+                this,
+                "Votre score envoyé: $score",
+                Toast.LENGTH_LONG
+            ).show()
+
+            tryFinishGame()
+        }
     }
+
     fun tryFinishGame() {
         if (MultiplayerGameState.bothScoresReceived() && !MultiplayerGameState.victorySent) {
-            val won = MultiplayerGameState.isWinner()  // Déterminer si le joueur a gagné
+            val won = MultiplayerGameState.isWinner()
             MultiplayerGameState.victorySent = true
 
-            // Envoyer le message de victoire ou défaite
-            if (won) {
-                BluetoothManager.bluetoothService?.sendMessage("WINNER")
-            } else {
-                BluetoothManager.bluetoothService?.sendMessage("LOSER")
-            }
+            BluetoothManager.bluetoothService?.sendMessage(if (won) "WINNER" else "LOSER")
 
-            // Afficher l'écran final avec les scores
-            val intent = Intent(this, FinalScoreActivity::class.java)
-            intent.putExtra("totalScore", MultiplayerGameState.localScore!! + MultiplayerGameState.opponentScore!!)
-            intent.putExtra("won", won)
+            val intent = Intent(this, FinalScoreActivity::class.java).apply {
+                putExtra("totalScore", totalScore)
+                putExtra("opponentScore", MultiplayerGameState.opponentScore)
+                putExtra("won", won)
+            }
             startActivity(intent)
             finish()
         }
     }
 
     private fun handleBluetoothMessage(message: String) {
+        Log.d("GameFlow", "Message reçu: $message")
+
         when {
-            message.startsWith("SCORE:") -> {  // Si c'est un score
-                val score = message.removePrefix("SCORE:").toIntOrNull()
-                if (score != null) {
+            message.startsWith("SCORE:") -> {
+                val score = message.removePrefix("SCORE:").toIntOrNull() ?: run {
+                    Log.e("GameFlow", "Score invalide reçu: $message")
+                    return
+                }
+
+                runOnUiThread {
                     MultiplayerGameState.opponentScore = score
-                    tryFinishGame()  // Vérifier si on peut finir le jeu
+                    Toast.makeText(
+                        this,
+                        "Score adversaire reçu: $score",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    tryFinishGame()
                 }
             }
-            message == "WINNER" -> {  // Si c'est un message de victoire
-                goToResultScreen(true)
-            }
-            message == "LOSER" -> {  // Si c'est un message de défaite
-                goToResultScreen(false)
-            }
+            message == "WINNER" -> goToResultScreen(false) // L'autre joueur a gagné
+            message == "LOSER" -> goToResultScreen(true) // Nous avons gagné
         }
     }
 

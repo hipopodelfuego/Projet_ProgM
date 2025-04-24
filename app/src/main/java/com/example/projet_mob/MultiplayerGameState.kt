@@ -2,17 +2,22 @@ package com.example.projet_mob
 
 object MultiplayerGameState {
     var playerScore: Int = 0
-    var opponentScore: Int = 0
+    var opponentScore: Int? = null
     var localScore: Int? = null
     var victorySent: Boolean = false
 
-    // Vérifie si les scores des deux joueurs sont reçus
+    fun reset() {
+        playerScore = 0
+        opponentScore = null
+        localScore = null
+        victorySent = false
+    }
+
     fun bothScoresReceived(): Boolean {
         return localScore != null && opponentScore != null
     }
 
-    // Vérifie si le joueur local a gagné
     fun isWinner(): Boolean {
-        return localScore!! > opponentScore!!
+        return (localScore ?: 0) > (opponentScore ?: 0)
     }
 }
