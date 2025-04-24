@@ -1,9 +1,12 @@
 package com.example.projet_mob.bluetooth
 
-import MultiplayerGameActivity
 import android.Manifest
 import android.app.Activity
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothServerSocket
+import android.bluetooth.BluetoothSocket
+import android.bluetooth.BluetoothManager
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
@@ -21,6 +24,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.core.content.ContextCompat
 import java.io.IOException
 import java.util.*
+import com.example.projet_mob.MultiplayerGameActivity
+import com.example.projet_mob.MultiplayerGameState
 
 val SPP_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
@@ -33,6 +38,8 @@ class MyBluetoothService(
     private var deviceFoundCallback: ((String, String) -> Unit)? = null
     private var advertiseCallback: AdvertiseCallback? = null
     private var advertiseTimer: CountDownTimer? = null
+    var onConnectedCallback: (() -> Unit)? = null
+    var onMessageReceivedCallback: ((String) -> Unit)? = null
 
     private val discoveryReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -59,6 +66,8 @@ class MyBluetoothService(
                 Toast.LENGTH_SHORT
             ).show()
         } ?: throw IllegalStateException("Activity must be a ComponentActivity for permission handling")
+    private var gameStarted = false
+
 
     init {
         val btManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -134,6 +143,7 @@ class MyBluetoothService(
                 bluetoothAdapter.cancelDiscovery()
                 socket.connect()
                 connectedSocket = socket
+                onConnectedCallback?.invoke()
 
 // Ajouter gestion des messages entrants
                 Thread {
@@ -314,20 +324,36 @@ class MyBluetoothService(
             Log.e("Bluetooth", "Erreur lors de l'envoi du message", e)
         }
     }
+
     private fun handleMessage(message: String) {
         when {
             message.startsWith("START_GAME:") -> {
-                val ids = message.removePrefix("START_GAME:")
-                    .split(",").mapNotNull { it.toIntOrNull() }
+                if (gameStarted) {
+                    return
+                }
 
+                gameStarted = true
+                val ids = message.removePrefix("START_GAME:").split(",").mapNotNull { it.toIntOrNull() }
                 val intent = Intent(context, MultiplayerGameActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 intent.putExtra("challenge_ids", ids.toIntArray())
                 context.startActivity(intent)
+
+                Log.d("Bluetooth", "Démarrage du jeu avec les ids : ${ids.joinToString()}")
+                sendMessage("START_GAME:${ids.joinToString(",")}")
             }
 
             message.startsWith("SCORE:") -> {
-                val opponentScore = message.removePrefix("SCORE:").toIntOrNull() ?: return
-                MultiplayerGameActivity.setOpponentScore(opponentScore)
+                val score = message.removePrefix("SCORE:").toIntOrNull() ?: return
+                // Update the opponent's score
+                MultiplayerGameState.opponentScore = score
+
+                // Send the local score to the opponent
+                val localScore = MultiplayerGameState.playerScore
+                sendMessage("SCORE:$localScore") // Send the local player's score
+
+                // Try to finish the game if both scores are received
+                (context as? MultiplayerGameActivity)?.tryFinishGame()
             }
 
             message == "WINNER" -> {
@@ -339,5 +365,6 @@ class MyBluetoothService(
             }
         }
     }
+
 
 }
