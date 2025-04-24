@@ -13,7 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.projet_mob.bluetooth.MyBluetoothService
 import com.example.projet_mob.activity.*
-import com.example.projet_mob.ui.theme.BluetoothManager
+import com.example.projet_mob.bluetooth.BluetoothManager
 
 class MultiplayerMenu : ComponentActivity() {
     private lateinit var myBluetoothService: MyBluetoothService

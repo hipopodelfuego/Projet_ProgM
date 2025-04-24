@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.example.projet_mob.activity.*
-import com.example.projet_mob.ui.theme.BluetoothManager
+import com.example.projet_mob.bluetooth.BluetoothManager
 
 class MultiplayerGameActivity : Activity() {
 
