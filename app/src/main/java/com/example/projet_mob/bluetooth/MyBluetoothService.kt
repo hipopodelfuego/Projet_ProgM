@@ -329,48 +329,46 @@ class MyBluetoothService(
     }
 
     private fun handleMessage(message: String) {
-        when {
-            message.startsWith("START_GAME:") -> {
-                if (gameStarted) {
-                    return
+        message.split("\n").forEach { singleMessage ->
+            if (singleMessage.isNotEmpty()) {
+                Log.d("Bluetooth", "Traitement du message: $singleMessage")
+
+                when {
+                    singleMessage.startsWith("START_GAME:") -> {
+                        if (gameStarted) {
+                            return
+                        }
+
+                        gameStarted = true
+                        val ids = singleMessage.removePrefix("START_GAME:").split(",")
+                            .mapNotNull { it.toIntOrNull() }
+                        val intent = Intent(context, MultiplayerGameActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.putExtra("challenge_ids", ids.toIntArray())
+                        context.startActivity(intent)
+
+                        Log.d("Bluetooth", "Démarrage du jeu avec les ids : ${ids.joinToString()}")
+                        sendMessage("START_GAME:${ids.joinToString(",")}")
+                    }
+
+                    singleMessage.startsWith("SCORE:") -> {
+                        val score =
+                            singleMessage.removePrefix("SCORE:").toIntOrNull() ?: return@forEach
+                        context.runOnUiThread {
+                            MultiplayerGameState.opponentScore = score
+                            (context as? MultiplayerGameActivity)?.tryFinishGame()
+                        }
+                    }
+
+                    singleMessage == "WINNER" -> {
+                        MultiplayerGameActivity.setVictory(false)
+                    }
+
+                    singleMessage == "LOSER" -> {
+                        MultiplayerGameActivity.setVictory(true)
+                    }
                 }
-
-                gameStarted = true
-                val ids = message.removePrefix("START_GAME:").split(",").mapNotNull { it.toIntOrNull() }
-                val intent = Intent(context, MultiplayerGameActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("challenge_ids", ids.toIntArray())
-                context.startActivity(intent)
-
-                Log.d("Bluetooth", "Démarrage du jeu avec les ids : ${ids.joinToString()}")
-                sendMessage("START_GAME:${ids.joinToString(",")}")
-            }
-
-            message.startsWith("SCORE:") -> {
-                val score = message.removePrefix("SCORE:").toIntOrNull() ?: return
-                Log.d("Bluetooth", "Score reçu: $score")
-
-                context.runOnUiThread {
-                    MultiplayerGameState.opponentScore = score
-                    Toast.makeText(
-                        context,
-                        "Score adversaire: $score",
-                        Toast.LENGTH_LONG
-                    ).show()
-
-                    (context as? MultiplayerGameActivity)?.tryFinishGame()
-                }
-            }
-
-            message == "WINNER" -> {
-                MultiplayerGameActivity.setVictory(true)
-            }
-
-            message == "LOSER" -> {
-                MultiplayerGameActivity.setVictory(false)
             }
         }
     }
-
-
 }

@@ -1,10 +1,10 @@
 package com.example.projet_mob
 
 import android.app.Activity
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import android.media.MediaPlayer
 
 class FinalScoreActivity : Activity() {
 
@@ -15,19 +15,22 @@ class FinalScoreActivity : Activity() {
         setContentView(R.layout.activity_final_score)
 
         val finalScore = intent.getIntExtra("totalScore", 0)
+        val isMultiplayer = intent.getBooleanExtra("multiplayer", false)
+        val won = intent.getBooleanExtra("won", false)
+
         val scoreText = findViewById<TextView>(R.id.scoreFinalText)
         val button = findViewById<Button>(R.id.returnMenuButton)
 
         scoreText.text = getString(R.string.score_cumul_text, finalScore)
 
-        val won = intent.getBooleanExtra("won", false)
-        val soundRes = if (won) R.raw.victory else R.raw.defeat
+        val soundRes = if (isMultiplayer) {
+            if (won) R.raw.victory else R.raw.defeat
+        } else {
+            R.raw.end_music
+        }
 
-        MediaPlayer.create(this, soundRes).apply {
+        mediaPlayer = MediaPlayer.create(this, soundRes).apply {
             start()
-            setOnCompletionListener {
-                it.release()
-            }
         }
 
         button.setOnClickListener {
