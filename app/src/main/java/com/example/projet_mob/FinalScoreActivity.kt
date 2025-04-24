@@ -20,20 +20,21 @@ class FinalScoreActivity : Activity() {
 
         scoreText.text = getString(R.string.score_cumul_text, finalScore)
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.end_music)
-        mediaPlayer?.start()
+        val won = intent.getBooleanExtra("won", false)
+        val soundRes = if (won) R.raw.victory else R.raw.defeat
+
+        MediaPlayer.create(this, soundRes).apply {
+            start()
+            setOnCompletionListener {
+                it.release()
+            }
+        }
 
         button.setOnClickListener {
-            finish() //revenir au menu principal
+            finish()
         }
-        val won = intent.getBooleanExtra("won", false)
-        if (won) {
-            MediaPlayer.create(this, R.raw.victory).start()
-        } else {
-            MediaPlayer.create(this, R.raw.defeat).start()
-        }
-
     }
+
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release()

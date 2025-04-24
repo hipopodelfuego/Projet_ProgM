@@ -13,7 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.projet_mob.bluetooth.MyBluetoothService
 import com.example.projet_mob.activity.*
-import com.example.projet_mob.bluetooth.BluetoothManager
+import com.example.projet_mob.ui.theme.BluetoothManager
 
 class MultiplayerMenu : ComponentActivity() {
     private lateinit var myBluetoothService: MyBluetoothService
@@ -81,7 +81,18 @@ class MultiplayerMenu : ComponentActivity() {
         btnStartGame.setOnClickListener {
             val randomIds = listOf(0, 1, 2, 3, 4, 5).shuffled().take(3)
             val startGameMessage = "START_GAME:${randomIds.joinToString(",")}"
+
+            // Réinitialiser l'état du jeu
+            MultiplayerGameState.reset()
+
+            // Envoyer le message
             myBluetoothService.sendMessage(startGameMessage)
+
+            // Démarrer localement aussi
+            val intent = Intent(this, MultiplayerGameActivity::class.java).apply {
+                putExtra("challenge_ids", randomIds.toIntArray())
+            }
+            startActivity(intent)
         }
 
         btnEnableBluetooth.setOnClickListener {

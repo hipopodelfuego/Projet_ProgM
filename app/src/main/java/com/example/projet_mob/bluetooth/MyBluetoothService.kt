@@ -188,33 +188,33 @@ class MyBluetoothService(
         }.start()
     }
 
-    // Fonction pour gérer la connexion acceptée
     fun acceptConnection(socket: BluetoothSocket) {
-        val inputStream = socket.inputStream
-        val outputStream = socket.outputStream
         connectedSocket = socket
 
-        val buffer = ByteArray(1024)
-        while (true) {
-            val bytesRead = inputStream.read(buffer)
-            if (bytesRead > 0) {
-                // Traiter les données reçues
-                val message = String(buffer, 0, bytesRead)
-                Log.d("Bluetooth", "Message reçu : $message")
+        Thread {
+            val inputStream = socket.inputStream
+            val buffer = ByteArray(1024)
 
-                // Répondre avec une confirmation ou autre action
-                outputStream.write("Réponse du serveur".toByteArray())
+            try {
+                while (true) {
+                    val bytesRead = inputStream.read(buffer)
+                    if (bytesRead > 0) {
+                        val message = String(buffer, 0, bytesRead)
+                        Log.d("Bluetooth", "Message brut reçu: $message")
+
+                        // Traiter chaque message séparément
+                        message.split("\n").forEach { singleMessage ->
+                            if (singleMessage.isNotEmpty()) {
+                                Log.d("Bluetooth", "Traitement du message: $singleMessage")
+                                handleMessage(singleMessage)
+                            }
+                        }
+                    }
+                }
+            } catch (e: IOException) {
+                Log.e("Bluetooth", "Erreur de lecture", e)
             }
-            val message = String(buffer, 0, bytesRead)
-            Log.d("Bluetooth", "Message reçu (serveur) : $message")
-
-            context.runOnUiThread {
-                Toast.makeText(context, "Serveur a reçu : $message", Toast.LENGTH_SHORT).show()
-            }
-
-            handleMessage(message)
-
-        }
+        }.start()
     }
 
     fun startAdvertising() {
@@ -318,8 +318,11 @@ class MyBluetoothService(
 
     fun sendMessage(message: String) {
         try {
-            connectedSocket?.outputStream?.write(message.toByteArray())
-            Log.d("Bluetooth", "Message envoyé : $message")
+            connectedSocket?.outputStream?.apply {
+                write("$message\n".toByteArray()) // Ajout du \n comme séparateur
+                flush()
+            }
+            Log.d("Bluetooth", "Message envoyé: $message")
         } catch (e: IOException) {
             Log.e("Bluetooth", "Erreur lors de l'envoi du message", e)
         }
@@ -345,15 +348,18 @@ class MyBluetoothService(
 
             message.startsWith("SCORE:") -> {
                 val score = message.removePrefix("SCORE:").toIntOrNull() ?: return
-                // Update the opponent's score
-                MultiplayerGameState.opponentScore = score
+                Log.d("Bluetooth", "Score reçu: $score")
 
-                // Send the local score to the opponent
-                val localScore = MultiplayerGameState.playerScore
-                sendMessage("SCORE:$localScore") // Send the local player's score
+                context.runOnUiThread {
+                    MultiplayerGameState.opponentScore = score
+                    Toast.makeText(
+                        context,
+                        "Score adversaire: $score",
+                        Toast.LENGTH_LONG
+                    ).show()
 
-                // Try to finish the game if both scores are received
-                (context as? MultiplayerGameActivity)?.tryFinishGame()
+                    (context as? MultiplayerGameActivity)?.tryFinishGame()
+                }
             }
 
             message == "WINNER" -> {
