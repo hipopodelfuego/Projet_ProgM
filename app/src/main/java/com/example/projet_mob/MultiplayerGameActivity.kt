@@ -82,6 +82,12 @@ class MultiplayerGameActivity : Activity() {
                 }
             }
         }
+        if (MultiplayerGameState.bothScoresReceived() && !MultiplayerGameState.victorySent) {
+            MultiplayerGameState.victorySent = true
+            val won = MultiplayerGameState.localScore!! >= MultiplayerGameState.opponentScore!!
+            BluetoothManager.bluetoothService?.sendMessage(if (won) "WINNER" else "LOSER")
+            showFinalScreen(won)
+        }
     }
 
 
