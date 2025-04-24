@@ -65,6 +65,7 @@ class SoloGame : Activity() {
             // Fin du jeu aléatoire
             val intent = Intent(this, FinalScoreActivity::class.java)
             intent.putExtra("totalScore", totalScore)
+            intent.putExtra("multiplayer", false)
             startActivity(intent)
         }
 

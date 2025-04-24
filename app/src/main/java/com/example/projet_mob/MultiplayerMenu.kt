@@ -82,13 +82,9 @@ class MultiplayerMenu : ComponentActivity() {
             val randomIds = listOf(0, 1, 2, 3, 4, 5).shuffled().take(3)
             val startGameMessage = "START_GAME:${randomIds.joinToString(",")}"
 
-            // Réinitialiser l'état du jeu
             MultiplayerGameState.reset()
-
-            // Envoyer le message
             myBluetoothService.sendMessage(startGameMessage)
 
-            // Démarrer localement aussi
             val intent = Intent(this, MultiplayerGameActivity::class.java).apply {
                 putExtra("challenge_ids", randomIds.toIntArray())
             }
@@ -115,7 +111,6 @@ class MultiplayerMenu : ComponentActivity() {
             }
         }
 
-        // Connexion à l'appareil sélectionné
         deviceListView.setOnItemClickListener { _, _, position, _ ->
             val deviceAddress = deviceAddresses[position]
             val device = myBluetoothService.bluetoothAdapter.getRemoteDevice(deviceAddress)

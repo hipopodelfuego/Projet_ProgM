@@ -3,8 +3,6 @@ package com.example.projet_mob
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.example.projet_mob.activity.*
@@ -42,6 +40,10 @@ class MultiplayerGameActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_multiplayer_game)
+
+        // Réinitialiser l'état du jeu
+        MultiplayerGameState.reset()
+
         BluetoothManager.bluetoothService?.apply {
             onMessageReceivedCallback = { message ->
                 runOnUiThread {
@@ -49,10 +51,75 @@ class MultiplayerGameActivity : Activity() {
                 }
             }
         }
+
         val ids = intent.getIntArrayExtra("challenge_ids") ?: intArrayOf(0, 1, 2)
         challengeSequence = ids.map { activityMap[it] }
-
         launchNextActivity()
+    }
+    private fun handleBluetoothMessage(message: String) {
+        Log.d("GameFlow", "Message reçu: $message")
+
+        when {
+            message.startsWith("SCORE:") -> {
+                val score = message.removePrefix("SCORE:").toIntOrNull() ?: return
+                Log.d("GameFlow", "Score adverse reçu: $score")
+
+                if (MultiplayerGameState.opponentScore == null) {
+                    MultiplayerGameState.opponentScore = score
+                    tryFinishGame()
+                } else {
+                    Log.d("GameFlow", "Score adverse déjà reçu, ignoré.")
+                }
+            }
+
+            message == "WINNER" || message == "LOSER" -> {
+                if (!finalScreenShown) {
+                    val won = message == "LOSER" // Si l'autre dit qu'on est le perdant, alors on a gagné
+                    Log.d("GameFlow", "Message de fin reçu: $message → won=$won")
+                    showFinalScreen(won)
+                } else {
+                    Log.d("GameFlow", "Final screen déjà affiché, message de victoire/perte ignoré.")
+                }
+            }
+        }
+    }
+
+
+    fun endGameWithScore(score: Int) {
+        runOnUiThread {
+            MultiplayerGameState.localScore = score
+            BluetoothManager.bluetoothService?.sendMessage("SCORE:$score")
+            tryFinishGame()
+        }
+    }
+
+    fun tryFinishGame() {
+        if (MultiplayerGameState.bothScoresReceived() && !MultiplayerGameState.victorySent) {
+            MultiplayerGameState.victorySent = true
+            val won = MultiplayerGameState.isWinner()
+
+            BluetoothManager.bluetoothService?.sendMessage(if (won) "WINNER" else "LOSER")
+            Log.d("GameFlow", "tryFinishGame triggered: local=${MultiplayerGameState.localScore}, opp=${MultiplayerGameState.opponentScore}")
+
+            showFinalScreen(won)
+        }
+    }
+
+    private var finalScreenShown = false
+
+    private fun showFinalScreen(won: Boolean) {
+        if (finalScreenShown) return
+        finalScreenShown = true
+
+        val intent = Intent(this, FinalScoreActivity::class.java).apply {
+            putExtra("totalScore", MultiplayerGameState.localScore ?: 0)
+            putExtra("opponentScore", MultiplayerGameState.opponentScore ?: 0)
+            putExtra("won", won)
+            putExtra("multiplayer", true)
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        startActivity(intent)
+        finish()
     }
 
     private fun launchNextActivity() {
@@ -60,33 +127,8 @@ class MultiplayerGameActivity : Activity() {
             val intent = Intent(this, challengeSequence[currentIndex])
             startActivityForResult(intent, coderequest)
         } else {
-            BluetoothManager.bluetoothService.sendMessage("SCORE:$totalScore")
-            waitForOpponentScore()
             endGameWithScore(totalScore)
         }
-    }
-
-    private fun waitForOpponentScore() {
-        Log.d("Multiplayer", "Waiting for opponent score...")
-        Handler(Looper.getMainLooper()).postDelayed({
-            Log.d("Multiplayer", "Current opponent score: $opponentScore")
-            if (opponentScore >= 0) {
-                val win = totalScore > opponentScore
-                BluetoothManager.bluetoothService.sendMessage(if (win) "WINNER" else "LOSER")
-                goToResultScreen(win)
-            } else {
-                // Attendre encore si l'adversaire n'a pas envoyé son score
-                waitForOpponentScore()
-            }
-        }, 1000)
-    }
-
-    private fun goToResultScreen(win: Boolean) {
-        val intent = Intent(this, FinalScoreActivity::class.java)
-        intent.putExtra("totalScore", totalScore)
-        intent.putExtra("opponentScore", opponentScore)
-        intent.putExtra("won", win)
-        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -98,64 +140,5 @@ class MultiplayerGameActivity : Activity() {
             launchNextActivity()
         }
     }
-    fun endGameWithScore(score: Int) {
-        runOnUiThread {
-            MultiplayerGameState.localScore = score
-            BluetoothManager.bluetoothService?.sendMessage("SCORE:$score")
-
-            // Afficher le score local immédiatement
-            Toast.makeText(
-                this,
-                "Votre score envoyé: $score",
-                Toast.LENGTH_LONG
-            ).show()
-
-            tryFinishGame()
-        }
-    }
-
-    fun tryFinishGame() {
-        if (MultiplayerGameState.bothScoresReceived() && !MultiplayerGameState.victorySent) {
-            val won = MultiplayerGameState.isWinner()
-            MultiplayerGameState.victorySent = true
-
-            BluetoothManager.bluetoothService?.sendMessage(if (won) "WINNER" else "LOSER")
-
-            val intent = Intent(this, FinalScoreActivity::class.java).apply {
-                putExtra("totalScore", totalScore)
-                putExtra("opponentScore", MultiplayerGameState.opponentScore)
-                putExtra("won", won)
-            }
-            startActivity(intent)
-            finish()
-        }
-    }
-
-    private fun handleBluetoothMessage(message: String) {
-        Log.d("GameFlow", "Message reçu: $message")
-
-        when {
-            message.startsWith("SCORE:") -> {
-                val score = message.removePrefix("SCORE:").toIntOrNull() ?: run {
-                    Log.e("GameFlow", "Score invalide reçu: $message")
-                    return
-                }
-
-                runOnUiThread {
-                    MultiplayerGameState.opponentScore = score
-                    Toast.makeText(
-                        this,
-                        "Score adversaire reçu: $score",
-                        Toast.LENGTH_LONG
-                    ).show()
-
-                    tryFinishGame()
-                }
-            }
-            message == "WINNER" -> goToResultScreen(false) // L'autre joueur a gagné
-            message == "LOSER" -> goToResultScreen(true) // Nous avons gagné
-        }
-    }
-
 
 }
